@@ -3,7 +3,7 @@ import { SafeAreaView, Text, Button } from "react-native";
 import { getAuth, signOut } from "firebase/auth";
 import { useNavigation } from "@react-navigation/native";
 import { app } from "../firebaseConfig";
-import Navbar from "../components/navbar";
+import Navbar from "../../components/navbar";
 
 const SettingsScreen = ({ navigation }) => {
   const auth = getAuth(app);

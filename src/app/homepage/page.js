@@ -3,10 +3,10 @@ import { StyleSheet, Text, View, Button, SafeAreaView } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { getAuth } from "firebase/auth";
 import { app } from "../firebaseConfig";
-import Navbar from "../components/navbar";
-import getUserInfo from "../hooks/getUserInfo";
+import Navbar from "../../components/navbar";
+import getUserInfo from "../../hooks/getUserInfo";
 import { WebView } from "react-native-webview";
-import generateJwt from "../hooks/generateToken";
+import generateJwt from "../../hooks/generateToken";
 
 const HomeScreen = ({ navigation }) => {
   const [userInfo, setUserInfo] = React.useState(null);

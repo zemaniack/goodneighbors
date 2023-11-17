@@ -25,9 +25,9 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import uploadImage from "../hooks/uploadImage";
-import pickImage from "../hooks/pickImage";
-import Navbar from "../components/navbar";
+import uploadImage from "../../hooks/uploadImage";
+import pickImage from "../../hooks/pickImage";
+import Navbar from "../../components/navbar";
 
 const ProfileScreen = ({ navigation }) => {
   // Profile information states
