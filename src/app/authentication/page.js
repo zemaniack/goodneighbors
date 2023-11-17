@@ -13,7 +13,7 @@ import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-const AuthScreen = ({ navigation }) => {
+const AuthScreen = () => {
   // States for the form inputs
   const [action, setAction] = React.useState("login");
   const [email, setEmail] = React.useState("");

@@ -20,6 +20,8 @@ const generateJwt = async () => {
   };
 
   const options = {
+    algorithm: "HS256",
+    expiresIn: tokenExpiryInMinutes * 60,
     header: {
       alg: "HS256",
       typ: "JWT",
@@ -33,7 +35,6 @@ const generateJwt = async () => {
     aud: "tableau",
     sub: userId,
     scp: scopes,
-    exp: Math.floor(Date.now() / 1000) + tokenExpiryInMinutes * 60,
     ...userAttributes,
   };
 

@@ -43,6 +43,11 @@ const HomeScreen = () => {
         return (
           <div>
             <p>Good job creating your account!</p>
+            <tableau-viz
+              id="tableauViz"
+              src="https://your-tableau-server/views/my-workbook/my-view"
+              token="JWT generated from connected app secrets"
+            ></tableau-viz>
           </div>
         );
       }
