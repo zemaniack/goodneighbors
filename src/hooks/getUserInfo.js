@@ -1,6 +1,6 @@
 import React from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { app, db } from "../firebaseConfig";
+import { app, db } from "../../firebaseConfig";
 import { collection, getDocs, query, where } from "firebase/firestore";
 
 // This will get the user's info from the database and return it as an object

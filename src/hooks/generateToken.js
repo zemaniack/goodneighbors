@@ -19,11 +19,13 @@ const generateJwt = async () => {
     //  "[User Attribute Name]": "[User Attribute Value]",
   };
 
-  const header = {
-    alg: "HS256",
-    typ: "JWT",
-    kid: secretId,
-    iss: clientId,
+  const options = {
+    header: {
+      alg: "HS256",
+      typ: "JWT",
+      kid: secretId,
+      iss: clientId,
+    },
   };
 
   const data = {
@@ -35,7 +37,7 @@ const generateJwt = async () => {
     ...userAttributes,
   };
 
-  const token = jwt.sign(data, secret, { header });
+  const token = jwt.sign(data, secret, options);
   console.log(token);
 
   return token;

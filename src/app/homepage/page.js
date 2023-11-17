@@ -1,14 +1,15 @@
+"use client";
 import React from "react";
-import { StyleSheet, Text, View, Button, SafeAreaView } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+// import { StyleSheet, Text, View, Button, SafeAreaView } from "react-native";
+// import { LinearGradient } from "expo-linear-gradient";
 import { getAuth } from "firebase/auth";
-import { app } from "../firebaseConfig";
-import Navbar from "../../components/navbar";
+import { app } from "../../../firebaseConfig";
+// import Navbar from "../../components/navbar";
 import getUserInfo from "../../hooks/getUserInfo";
-import { WebView } from "react-native-webview";
+// import { WebView } from "react-native-webview";
 import generateJwt from "../../hooks/generateToken";
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = () => {
   const [userInfo, setUserInfo] = React.useState(null);
   const [token, setToken] = React.useState(null);
 
@@ -26,21 +27,23 @@ const HomeScreen = ({ navigation }) => {
 
   const pageContent = () => {
     if (userInfo === null) {
-      <View>
-        <Text>Loading...</Text>
-      </View>;
+      return (
+        <div>
+          <p>Loading...</p>
+        </div>
+      );
     } else {
       if (!userInfo.accountSetup) {
         return (
-          <View>
-            <Text>Looks like you haven't set up your account yet!</Text>
-          </View>
+          <div>
+            <p>Looks like you haven't set up your account yet!</p>
+          </div>
         );
       } else {
         return (
-          <View>
-            <Text>Good job creating your account!</Text>
-          </View>
+          <div>
+            <p>Good job creating your account!</p>
+          </div>
         );
       }
     }
@@ -50,34 +53,15 @@ const HomeScreen = ({ navigation }) => {
     "https://prod-useast-b.online.tableau.com/t/communitydashboard/views/disabilities_communities/Dashboard2/b347fd8f-9ae1-4fc9-8c1a-867b5bdd6120/8c879fdb-6fd7-46a4-bb88-a01be172d755?:embed=yes";
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Navbar />
-      <LinearGradient
-        colors={["#4c669f", "#3b5998", "#192f6a"]}
-        style={styles.container}
-        start={{ x: 0, y: 1 }}
-        end={{ x: 1, y: 0 }}
-      >
-        <View style={styles.container}>
+    <div className="flex flex-col items-center justify-center h-screen w-screen">
+      <div className="flex flex-col items-center justify-center h-screen w-screen bg-gradient-to-r from-blue-500 via-blue-700 to-blue-900">
+        <div className="flex flex-col items-center justify-center h-screen w-screen">
           {pageContent()}
-          {/* <WebView
-            source={{ uri: tableauUrl }} // Pass the Tableau embed code as HTML
-          /> */}
-          <iframe src={tableauUrl} height={"90%"} width={"90%"} />
-        </View>
-      </LinearGradient>
-    </SafeAreaView>
+          {/* <iframe src={tableauUrl} height="90%" width="90%" /> */}
+        </div>
+      </div>
+    </div>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    height: "100%",
-    width: "100%",
-  },
-});
 
 export default HomeScreen;

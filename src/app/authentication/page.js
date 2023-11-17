@@ -10,6 +10,8 @@ import {
 } from "firebase/auth";
 import { app, db } from "../../../firebaseConfig";
 import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const AuthScreen = ({ navigation }) => {
   // States for the form inputs
@@ -27,6 +29,11 @@ const AuthScreen = ({ navigation }) => {
   // Firebase auth
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider(app);
+
+  // Routing
+  const router = useRouter();
+  router.prefetch("/profile");
+  router.prefetch("/homepage");
 
   // Function to chek that all fields are filled out
   const checkFields = () => {
@@ -198,9 +205,9 @@ const AuthScreen = ({ navigation }) => {
         accountSetup: false,
       });
       console.log("Document written with ID: ", docRef.id);
-      navigation.navigate("Profile");
+      router.push("/profile");
     } else {
-      navigation.navigate("Home");
+      router.push("/homepage");
     }
   };
 
