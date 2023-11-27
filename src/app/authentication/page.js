@@ -155,7 +155,8 @@ const AuthScreen = () => {
           const user = userCredential.user;
           console.log(user);
 
-          navigation.navigate("Home");
+          // navigation.navigate("Home");
+          router.push("/homepage");
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -205,7 +206,8 @@ const AuthScreen = () => {
         accountSetup: false,
       });
       console.log("Document written with ID: ", docRef.id);
-      router.push("/profile");
+      // router.push("/profile");
+      router.push("/homepage");
     } else {
       router.push("/homepage");
     }
@@ -242,7 +244,7 @@ const AuthScreen = () => {
             placeholder="BuffaloBillsFan123"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="h-12 ml-0 m-3 border-2 p-2 rounded bg-white placeholder-gray-500 w-full"
+            className="h-12 ml-0 m-3 border-2 p-2 rounded bg-white text-black placeholder-gray-500 w-full"
           />
         </div>
         {/* <div className="flex justify-between w-full"> */}
@@ -253,7 +255,7 @@ const AuthScreen = () => {
             placeholder="Jane"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-            className="h-12 m-3 ml-0 border-2 p-2 rounded bg-white placeholder-gray-500 w-full"
+            className="h-12 m-3 ml-0 border-2 p-2 rounded bg-white placeholder-gray-500 text-black w-full "
           />
         </div>
         <div className="w-full">
@@ -263,7 +265,7 @@ const AuthScreen = () => {
             placeholder="Smith"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
-            className="h-12 m-3 ml-0 border-2 p-2 rounded bg-white placeholder-gray-500 w-full"
+            className="h-12 m-3 ml-0 border-2 p-2 rounded bg-white text-black placeholder-gray-500 w-full"
           />
         </div>
         {/* </div> */}
@@ -274,7 +276,7 @@ const AuthScreen = () => {
             placeholder="email@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="h-12 m-3 ml-0 border-2 p-2 rounded bg-white placeholder-gray-500 w-full"
+            className="h-12 m-3 ml-0 border-2 p-2 rounded bg-white text-black placeholder-gray-500 w-full"
           />
         </div>
         <div className="w-full">
@@ -284,7 +286,7 @@ const AuthScreen = () => {
             placeholder="ABCDEF123456"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="h-12 m-3 ml-0 border-2 p-2 rounded bg-white placeholder-gray-500 w-full"
+            className="h-12 m-3 ml-0 border-2 p-2 rounded bg-white text-black placeholder-gray-500 w-full"
           />
         </div>
         <div className="w-full">
@@ -294,7 +296,7 @@ const AuthScreen = () => {
             placeholder="ABCDEF123456"
             value={passwordConfirmation}
             onChange={(e) => setPasswordConfirmation(e.target.value)}
-            className="h-12 m-3 ml-0 border-2 p-2 rounded bg-white placeholder-gray-500 w-full"
+            className="h-12 m-3 ml-0 border-2 p-2 rounded bg-white text-black placeholder-gray-500 w-full"
           />
         </div>
         <p>{createError === "" ? "" : createError}</p>
@@ -330,7 +332,7 @@ const AuthScreen = () => {
               placeholder="email@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className={`h-12 m-3 ml-0 border-2 p-2 rounded w-full bg-white placeholder-gray-500  ${
+              className={`h-12 m-3 ml-0 border-2 p-2 rounded w-full bg-white text-black placeholder-gray-500  ${
                 email === "" && loginError !== "" ? "border-red-500" : ""
               }`}
             />
@@ -344,7 +346,7 @@ const AuthScreen = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               type="password"
-              className={`h-12 m-3 ml-0 border-2 p-2 rounded w-full bg-white placeholder-gray-500 ${
+              className={`h-12 m-3 ml-0 border-2 p-2 rounded w-full bg-white text-black placeholder-gray-500 ${
                 password === "" && loginError !== "" ? "border-red-500" : ""
               }`}
             />

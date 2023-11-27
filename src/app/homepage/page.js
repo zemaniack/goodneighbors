@@ -7,7 +7,7 @@ import { app } from "../../../firebaseConfig";
 // import Navbar from "../../components/navbar";
 import getUserInfo from "../../hooks/getUserInfo";
 // import { WebView } from "react-native-webview";
-import generateJwt from "../../hooks/generateToken";
+// import generateJwt from "../../hooks/generateToken";
 
 const HomeScreen = () => {
   const [userInfo, setUserInfo] = React.useState(null);
@@ -19,7 +19,7 @@ const HomeScreen = () => {
       // setUserInfo(userInformation);
       // pageContent();
       console.log(userInfo);
-      const token = await generateJwt();
+      // const token = await generateJwt();
     }
     loadUserInfo();
     console.log(userInfo);

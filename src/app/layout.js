@@ -13,7 +13,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="">
-        {/* <Navbar /> */}
+        <Navbar />
         <div className="h-auto">{children}</div>
       </body>
     </html>
