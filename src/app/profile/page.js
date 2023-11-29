@@ -15,6 +15,8 @@ import {
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import uploadImage from "../../hooks/uploadImage";
+import ProfileCard from "../../components/profileCard";
+import { getUserInfo } from "../../hooks/getUserInfo";
 
 const ProfileScreen = () => {
   const router = useRouter();
@@ -41,41 +43,44 @@ const ProfileScreen = () => {
 
   // Instantiation of auth
   const auth = getAuth(app);
-  // console.log(auth.currentUser);
+  console.log(auth.currentUser);
 
   // When page loads, get user information
   useEffect(() => {
     const loadData = async () => {
-      const docSnap = await getSnapshot();
+      if (auth.currentUser) {
+        const docSnap = await getSnapshot();
 
-      if (docSnap) {
-        const data = docSnap.data();
-        setEmail(data?.email ?? "");
-        setUsername(data?.username ?? "");
-        setAddress(data?.address ?? "");
-        setAccountType(data?.accountType ?? "");
-        setPhoneNumber(data?.phoneNumber ?? "");
-        setDob(data?.dob ?? "");
-        setEmergencyContactName(data?.emergencyContactName ?? "");
-        setEmergencyContactNumber(data?.emergencyContactNumber ?? "");
-        setEmergencyContactEmail(data?.emergencyContactEmail ?? "");
-        setNumberOfChildren(data?.numberOfChildren ?? "");
-        setNumberOfAdults(data?.numberOfAdults ?? "");
-        setNumberOfPets(data?.numberOfPets ?? "");
-        setMedicalConditions(data?.medicalConditions ?? "");
-        setFirstName(data?.firstName ?? "");
-        setLastName(data?.lastName ?? "");
-      } else {
-        console.log("No such document!");
+        if (docSnap) {
+          const data = docSnap.data();
+          setEmail(data?.email ?? "");
+          setUsername(data?.username ?? "");
+          setAddress(data?.address ?? "");
+          setAccountType(data?.accountType ?? "");
+          setPhoneNumber(data?.phoneNumber ?? "");
+          setDob(data?.dob ?? "");
+          setEmergencyContactName(data?.emergencyContactName ?? "");
+          setEmergencyContactNumber(data?.emergencyContactNumber ?? "");
+          setEmergencyContactEmail(data?.emergencyContactEmail ?? "");
+          setNumberOfChildren(data?.numberOfChildren ?? "");
+          setNumberOfAdults(data?.numberOfAdults ?? "");
+          setNumberOfPets(data?.numberOfPets ?? "");
+          setMedicalConditions(data?.medicalConditions ?? "");
+          setFirstName(data?.firstName ?? "");
+          setLastName(data?.lastName ?? "");
+        } else {
+          console.log("No such document!");
+        }
       }
     };
-    loadData();
+    auth.onAuthStateChanged(loadData);
   }, []);
 
   const getSnapshot = async () => {
     const userRef = collection(db, "users");
     const q = query(userRef, where("uid", "==", auth.currentUser.uid));
     const querySnapshot = await getDocs(q);
+    console.log("snap", querySnapshot);
     if (!querySnapshot.empty) {
       return querySnapshot.docs[0];
     }
@@ -119,180 +124,178 @@ const ProfileScreen = () => {
     }
   };
 
-  return (
-    <div>
+  const modalContent = () => {
+    return (
       <div>
+        <h1>Edit Account Information</h1>
         <div>
-          <h1>Public Profile</h1>
-          <div>
-            {profilePicture === null ? (
-              <Image
-                src="/defaultProfileIcon.png"
-                alt="Profile Picture"
-                width={100}
-                height={100}
-              />
-            ) : (
-              <Image
-                src={profilePicture}
-                alt="Profile Picture"
-                width={100}
-                height={100}
-              />
-            )}
+          <label>First Name</label>
+          <input
+            type="text"
+            placeholder="Jane"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+          />
+          <label>Last Name</label>
+          <input
+            type="text"
+            placeholder="Smith"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+          />
+          {/* </div> */}
+          <label>Email</label>
+          <input
+            type="email"
+            placeholder="email@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <label>Username</label>
+          <input
+            type="text"
+            placeholder="BuffaloBillsFan123"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          <label>Address</label>
+          <input
+            type="text"
+            placeholder="123 Street Name, County, State Zip"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+          />
+          <label>Account Type</label>
+          <input
+            type="text"
+            placeholder="(basic, volunteer, authority, authority coordinator)"
+            value={accountType}
+            onChange={(e) => setAccountType(e.target.value)}
+          />
+          <label>Phone Number</label>
+          <input
+            type="tel"
+            placeholder="(123)-456-7890"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+          />
+          <label>Date of Birth</label>
+          <input
+            type="date"
+            placeholder="January 1, 2000"
+            value={dob}
+            onChange={(e) => setDob(e.target.value)}
+          />
+          <h2>Emergency Contact Information</h2>
+          <p>
+            This will be used only in emergency situations, such as being
+            incapacitated or unable to be reached during a disaster situation.
+          </p>
+          <label>Emergency Contact Name</label>
+          <input
+            type="text"
+            placeholder="John Smith"
+            value={emergencyContactName}
+            onChange={(e) => setEmergencyContactName(e.target.value)}
+          />
+          <label>Emergency Contact Number</label>
+          <input
+            type="tel"
+            placeholder="(123)-456-7890"
+            value={emergencyContactNumber}
+            onChange={(e) => setEmergencyContactNumber(e.target.value)}
+          />
+          <label>Emergency Contact Email</label>
+          <input
+            type="email"
+            placeholder="email@email.com"
+            value={emergencyContactEmail}
+            onChange={(e) => setEmergencyContactEmail(e.target.value)}
+          />
+          <h2>Household Information</h2>
+          <p>
+            This information will be used to help first responders determine the
+            number of people and pets that may need assistance during a disaster
+            situation.
+          </p>
+          <label>Number of Adults</label>
+          <input
+            type="number"
+            placeholder="2"
+            value={numberOfAdults}
+            onChange={(e) => setNumberOfAdults(e.target.value)}
+          />
+          <label>Number of Children</label>
+          <input
+            type="number"
+            placeholder="3"
+            value={numberOfChildren}
+            onChange={(e) => setNumberOfChildren(e.target.value)}
+          />
+          <label>Number of Pets</label>
+          <input
+            type="number"
+            placeholder="Number of Pets"
+            value={numberOfPets}
+            onChange={(e) => setNumberOfPets(e.target.value)}
+          />
+          <label>Significant Medical Conditions or Disabilities</label>
+          <input
+            type="text"
+            placeholder="Chronic Heart Disease, Asthma, Depression, etc."
+            value={medicalConditions}
+            onChange={(e) => setMedicalConditions(e.target.value)}
+          />
+        </div>
+        <div>
+          <button onClick={handleSave}>Save Info</button>
+          <button onClick={() => setModalVisible(false)}>Close modal</button>
+        </div>
+      </div>
+    );
+  };
 
-            <button onClick={uploadPhoto}>Upload Photo</button>
-          </div>
-          <h2>{auth.currentUser.displayName}</h2>
+  const accountInfo = () => {
+    return (
+      <div>
+        <h1>Account Information</h1>
+        <div>
+          <h2>Personal Information</h2>
+          <p>Significant Medical Conditions or Disabilities</p>
         </div>
         <div>
-          <h1>Edit Account Information</h1>
-          <div>
-            <label>First Name</label>
-            <input
-              type="text"
-              placeholder="Jane"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-            />
-            <label>Last Name</label>
-            <input
-              type="text"
-              placeholder="Smith"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-            />
-            {/* </div> */}
-            <label>Email</label>
-            <input
-              type="email"
-              placeholder="email@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <label>Username</label>
-            <input
-              type="text"
-              placeholder="BuffaloBillsFan123"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-            <label>Address</label>
-            <input
-              type="text"
-              placeholder="123 Street Name, County, State Zip"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-            />
-            <label>Account Type</label>
-            <input
-              type="text"
-              placeholder="(basic, volunteer, authority, authority coordinator)"
-              value={accountType}
-              onChange={(e) => setAccountType(e.target.value)}
-            />
-            <label>Phone Number</label>
-            <input
-              type="tel"
-              placeholder="(123)-456-7890"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-            />
-            <label>Date of Birth</label>
-            <input
-              type="date"
-              placeholder="January 1, 2000"
-              value={dob}
-              onChange={(e) => setDob(e.target.value)}
-            />
-            <h2>Emergency Contact Information</h2>
-            <p>
-              This will be used only in emergency situations, such as being
-              incapacitated or unable to be reached during a disaster situation.
-            </p>
-            <label>Emergency Contact Name</label>
-            <input
-              type="text"
-              placeholder="John Smith"
-              value={emergencyContactName}
-              onChange={(e) => setEmergencyContactName(e.target.value)}
-            />
-            <label>Emergency Contact Number</label>
-            <input
-              type="tel"
-              placeholder="(123)-456-7890"
-              value={emergencyContactNumber}
-              onChange={(e) => setEmergencyContactNumber(e.target.value)}
-            />
-            <label>Emergency Contact Email</label>
-            <input
-              type="email"
-              placeholder="email@email.com"
-              value={emergencyContactEmail}
-              onChange={(e) => setEmergencyContactEmail(e.target.value)}
-            />
-            <h2>Household Information</h2>
-            <p>
-              This information will be used to help first responders determine
-              the number of people and pets that may need assistance during a
-              disaster situation.
-            </p>
-            <label>Number of Adults</label>
-            <input
-              type="number"
-              placeholder="2"
-              value={numberOfAdults}
-              onChange={(e) => setNumberOfAdults(e.target.value)}
-            />
-            <label>Number of Children</label>
-            <input
-              type="number"
-              placeholder="3"
-              value={numberOfChildren}
-              onChange={(e) => setNumberOfChildren(e.target.value)}
-            />
-            <label>Number of Pets</label>
-            <input
-              type="number"
-              placeholder="Number of Pets"
-              value={numberOfPets}
-              onChange={(e) => setNumberOfPets(e.target.value)}
-            />
-            <label>Significant Medical Conditions or Disabilities</label>
-            <input
-              type="text"
-              placeholder="Chronic Heart Disease, Asthma, Depression, etc."
-              value={medicalConditions}
-              onChange={(e) => setMedicalConditions(e.target.value)}
-            />
-          </div>
-          <div>
-            <button onClick={handleSave}>Save Info</button>
-            <button onClick={() => setModalVisible(false)}>Close modal</button>
-          </div>
+          <h2>Household Information</h2>
+          <p>Number of Adults: {numberOfAdults}</p>
+          <p>Number of Children: {numberOfChildren}</p>
+          <p>Number of Pets: {numberOfPets}</p>
+          <p>
+            Significant Medical Conditions or Disabilities: {medicalConditions}
+          </p>
         </div>
         <div>
-          <h1>Account Information</h1>
-          <div>
-            <h2>Personal Information</h2>
-            <p>Significant Medical Conditions or Disabilities</p>
-          </div>
-          <div>
-            <h2>Household Information</h2>
-            <p>Number of Adults: {numberOfAdults}</p>
-            <p>Number of Children: {numberOfChildren}</p>
-            <p>Number of Pets: {numberOfPets}</p>
-            <p>
-              Significant Medical Conditions or Disabilities:{" "}
-              {medicalConditions}
-            </p>
-          </div>
-          <div>
-            <h2>Emergency Contact Information</h2>
-          </div>
-          <button onClick={() => setModalVisible(true)}>
-            Edit account information
-          </button>
+          <h2>Emergency Contact Information</h2>
+        </div>
+        <button onClick={() => setModalVisible(true)}>
+          Edit account information
+        </button>
+      </div>
+    );
+  };
+
+  return (
+    <div className=" pt-10 min-h-screen bg-gradient-to-r from-blue-400 via-blue-500 to-blue-700">
+      <div className="flex flex-row justify-around items-center mx-auto">
+        <div className="">
+          <h1 className="text-xl">Your Public Profile</h1>
+          <ProfileCard
+            displayName={firstName + " " + lastName}
+            username={username}
+            profilePic={null}
+          />
+        </div>
+        <div>
+          <h1 className="text-xl">Your Account Information</h1>
+          {accountInfo()}
         </div>
       </div>
     </div>

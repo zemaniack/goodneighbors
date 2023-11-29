@@ -53,6 +53,14 @@ const AuthScreen = () => {
 
   // Function to create a new user in the database
   const createUser = async (user) => {
+    // Check if the user already exists in the database
+    const q = query(collection(db, "users"), where("uid", "==", user.uid));
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      console.log("User already exists in the database, skipping creation.");
+      return;
+    }
+
     // Should create a new user in the users collection
     try {
       const docRef = await addDoc(collection(db, "users"), {
@@ -206,8 +214,7 @@ const AuthScreen = () => {
         accountSetup: false,
       });
       console.log("Document written with ID: ", docRef.id);
-      // router.push("/profile");
-      router.push("/homepage");
+      router.push("/profile");
     } else {
       router.push("/homepage");
     }
@@ -387,7 +394,7 @@ const AuthScreen = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen w-screen bg-gradient-to-r from-blue-400 via-blue-500 to-blue-700">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-400 via-blue-500 to-blue-700">
       {action === "login" ? login() : createAccount()}
     </div>
   );
