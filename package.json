@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "antd": "^5.11.5",
     "firebase": "^10.6.0",
     "jsonwebtoken": "^9.0.2",
     "next": "14.0.2",

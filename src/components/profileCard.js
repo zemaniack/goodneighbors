@@ -9,11 +9,23 @@ const ProfileCard = (user) => {
 
   // Return the JSX for the profile card
   return (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-      {profilePic ? <img src={profilePic} alt="Profile" /> : <FaUser />}
+    <div
+      className="rounded-lg shadow-lg overflow-hidden p-5"
+      style={{
+        backgroundColor: "rgba(255, 255, 255, 0.1)",
+        // borderRadius: "5px",
+      }}
+    >
+      {/* {profilePic ? <img src={profilePic} alt="Profile" /> : <FaUser />} */}
+      <br />
+      <div
+        style={{ display: "flex", justifyContent: "center", fontSize: "3em" }}
+      >
+        <FaUser style={{ color: "white" }} />
+      </div>
       <div className="p-4">
-        <div className="text-lg text-black font-bold ">{displayName}</div>
-        <div className="text-sm text-black">
+        <div className="text-lg text-white font-bold ">{displayName}</div>
+        <div className="text-sm text-white">
           {username ? "@" + username : null}
         </div>
       </div>

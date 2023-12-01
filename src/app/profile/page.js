@@ -17,6 +17,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import uploadImage from "../../hooks/uploadImage";
 import ProfileCard from "../../components/profileCard";
 import { getUserInfo } from "../../hooks/getUserInfo";
+import { FaUser } from "react-icons/fa";
 
 const ProfileScreen = () => {
   const router = useRouter();
@@ -258,43 +259,79 @@ const ProfileScreen = () => {
   const accountInfo = () => {
     return (
       <div>
-        <h1>Account Information</h1>
-        <div>
-          <h2>Personal Information</h2>
-          <p>Significant Medical Conditions or Disabilities</p>
+        <h1 className="text-2xl font-bold border-b-2 border-white">
+          Account Information
+        </h1>
+        <br />
+        <div
+          className="rounded-lg shadow-lg overflow-hidden p-5"
+          style={{
+            backgroundColor: "rgba(255, 255, 255, 0.1)",
+            // borderRadius: "5px",
+          }}
+        >
+          <h2 className="text-xl font-bold">Personal Information</h2>
+          <p className="text-l">First Name: {firstName}</p>
+          <p>Last Name: {lastName}</p>
+          <p>Email: {email}</p>
+          <p>Username: {username}</p>
+          <p>Address: {address}</p>
+          <p>Account Type: {accountType}</p>
+          <p>Phone Number: {phoneNumber}</p>
+          <p>Date of Birth: {dob}</p>
         </div>
-        <div>
-          <h2>Household Information</h2>
+        <br />
+        <div
+          className="rounded-lg shadow-lg overflow-hidden p-5"
+          style={{
+            backgroundColor: "rgba(255, 255, 255, 0.1)",
+            // borderRadius: "5px",
+          }}
+        >
+          <h2 className="text-xl font-bold">Household Information</h2>
           <p>Number of Adults: {numberOfAdults}</p>
           <p>Number of Children: {numberOfChildren}</p>
-          <p>Number of Pets: {numberOfPets}</p>
-          <p>
-            Significant Medical Conditions or Disabilities: {medicalConditions}
-          </p>
         </div>
-        <div>
-          <h2>Emergency Contact Information</h2>
+        <br />
+        <div
+          className="rounded-lg shadow-lg overflow-hidden p-5"
+          style={{
+            backgroundColor: "rgba(255, 255, 255, 0.1)",
+            // borderRadius: "5px",
+          }}
+        >
+          <h2 className="text-xl font-bold">Emergency Contact Information</h2>
+          <p>Emergency Contact Name: {emergencyContactName}</p>
+          <p>Emergency Contact Number: {emergencyContactNumber}</p>
+          <p>Emergency Contact Email: {emergencyContactEmail}</p>
         </div>
-        <button onClick={() => setModalVisible(true)}>
+        <br />
+        <div
+          className="font-bold rounded-full h-auto w-auto flex bg-teal-300 p-2 cursor-pointer items-center justify-center"
+          onClick={() => setModalVisible(true)}
+        >
           Edit account information
-        </button>
+        </div>
       </div>
     );
   };
 
   return (
-    <div className=" pt-10 min-h-screen bg-gradient-to-r from-blue-400 via-blue-500 to-blue-700">
-      <div className="flex flex-row justify-around items-center mx-auto">
-        <div className="">
-          <h1 className="text-xl">Your Public Profile</h1>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-400 via-blue-500 to-blue-700">
+      <div className="flex w-full flex-row justify-around items-center mx-auto m-0">
+        <div className="h-full flex flex-col justify-center items-center">
+          <h1 className="text-2xl font-bold border-b-2 border-white">
+            Your Public Profile
+          </h1>
+          <br />
           <ProfileCard
             displayName={firstName + " " + lastName}
             username={username}
-            profilePic={null}
+            // profilePic={null}
           />
         </div>
-        <div>
-          <h1 className="text-xl">Your Account Information</h1>
+        <div className="h-full d-flex flex-column justify-content-center">
+          {/* <h1 className="text-xl">Your Account Information</h1> */}
           {accountInfo()}
         </div>
       </div>
