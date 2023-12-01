@@ -17,7 +17,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import uploadImage from "../../hooks/uploadImage";
 import ProfileCard from "../../components/profileCard";
 import { getUserInfo } from "../../hooks/getUserInfo";
-import { FaUser } from "react-icons/fa";
+import { Button, Modal } from "antd";
 
 const ProfileScreen = () => {
   const router = useRouter();
@@ -316,6 +316,10 @@ const ProfileScreen = () => {
     );
   };
 
+  const handleOk = () => {
+    setModalVisible(false);
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-400 via-blue-500 to-blue-700">
       <div className="flex w-full flex-row justify-around items-center mx-auto m-0">
@@ -335,6 +339,14 @@ const ProfileScreen = () => {
           {accountInfo()}
         </div>
       </div>
+      <Modal
+        open={modalVisible}
+        title="Edit Account Information"
+        onOk={() => handleOk()}
+        onCancel={() => setModalVisible(false)}
+      >
+        {modalContent()}
+      </Modal>
     </div>
   );
 };
