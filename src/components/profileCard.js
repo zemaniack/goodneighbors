@@ -1,8 +1,9 @@
 import React from "react";
 import { FaUser } from "react-icons/fa";
 import { MdModeEdit } from "react-icons/md";
-import { db, storage, ref } from "../../firebaseConfig";
+import { db, storage } from "../../firebaseConfig";
 import { useEffect } from "react";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const ProfileCard = ({ user, accountPage = false }) => {
   // Get the user's display name, username, and profile pic
