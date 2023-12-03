@@ -14,13 +14,15 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import uploadImage from "../../hooks/uploadImage";
 import ProfileCard from "../../components/profileCard";
 import { getUserInfo } from "../../hooks/getUserInfo";
-import { Button, Modal } from "antd";
+import { Button, Modal, Dropdown, Space } from "antd";
+import { DownOutlined, SmileOutlined } from "@ant-design/icons";
 
 const ProfileScreen = () => {
   const router = useRouter();
+  router.prefetch("/settings");
+
   // Profile information states
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -34,13 +36,32 @@ const ProfileScreen = () => {
   const [numberOfChildren, setNumberOfChildren] = useState("");
   const [numberOfAdults, setNumberOfAdults] = useState("");
   const [numberOfPets, setNumberOfPets] = useState("");
-  const [medicalConditions, setMedicalConditions] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [profilePicture, setProfilePicture] = useState(null);
 
   // Modal usage state
   const [modalVisible, setModalVisible] = useState(false);
+
+  // Dropdown items
+  const items = [
+    {
+      key: "1",
+      label: "Basic User",
+    },
+    {
+      key: "2",
+      label: "Volunteer",
+    },
+    {
+      key: "3",
+      label: "Authority",
+    },
+    {
+      key: "4",
+      label: "Authority Coordinator",
+    },
+  ];
 
   // Instantiation of auth
   const auth = getAuth(app);
@@ -66,7 +87,6 @@ const ProfileScreen = () => {
           setNumberOfChildren(data?.numberOfChildren ?? "");
           setNumberOfAdults(data?.numberOfAdults ?? "");
           setNumberOfPets(data?.numberOfPets ?? "");
-          setMedicalConditions(data?.medicalConditions ?? "");
           setFirstName(data?.firstName ?? "");
           setLastName(data?.lastName ?? "");
         } else {
@@ -88,6 +108,10 @@ const ProfileScreen = () => {
     return null;
   };
 
+  const onClick = ({ key }) => {
+    setAccountType(items[key - 1].label);
+  };
+
   const handleSave = async () => {
     const docSnap = await getSnapshot();
 
@@ -104,7 +128,6 @@ const ProfileScreen = () => {
       numberOfChildren: numberOfChildren,
       numberOfAdults: numberOfAdults,
       numberOfPets: numberOfPets,
-      medicalConditions: medicalConditions,
       firstName: firstName,
       lastName: lastName,
     })
@@ -127,131 +150,137 @@ const ProfileScreen = () => {
 
   const modalContent = () => {
     return (
-      <div>
-        <h1>Edit Account Information</h1>
-        <div>
-          <label>First Name</label>
-          <input
-            type="text"
-            placeholder="Jane"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-          />
-          <label>Last Name</label>
-          <input
-            type="text"
-            placeholder="Smith"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-          />
-          {/* </div> */}
-          <label>Email</label>
-          <input
-            type="email"
-            placeholder="email@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <label>Username</label>
-          <input
-            type="text"
-            placeholder="BuffaloBillsFan123"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <label>Address</label>
-          <input
-            type="text"
-            placeholder="123 Street Name, County, State Zip"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-          />
-          <label>Account Type</label>
-          <input
-            type="text"
-            placeholder="(basic, volunteer, authority, authority coordinator)"
-            value={accountType}
-            onChange={(e) => setAccountType(e.target.value)}
-          />
-          <label>Phone Number</label>
-          <input
-            type="tel"
-            placeholder="(123)-456-7890"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-          />
-          <label>Date of Birth</label>
-          <input
-            type="date"
-            placeholder="January 1, 2000"
-            value={dob}
-            onChange={(e) => setDob(e.target.value)}
-          />
-          <h2>Emergency Contact Information</h2>
-          <p>
-            This will be used only in emergency situations, such as being
-            incapacitated or unable to be reached during a disaster situation.
-          </p>
-          <label>Emergency Contact Name</label>
-          <input
-            type="text"
-            placeholder="John Smith"
-            value={emergencyContactName}
-            onChange={(e) => setEmergencyContactName(e.target.value)}
-          />
-          <label>Emergency Contact Number</label>
-          <input
-            type="tel"
-            placeholder="(123)-456-7890"
-            value={emergencyContactNumber}
-            onChange={(e) => setEmergencyContactNumber(e.target.value)}
-          />
-          <label>Emergency Contact Email</label>
-          <input
-            type="email"
-            placeholder="email@email.com"
-            value={emergencyContactEmail}
-            onChange={(e) => setEmergencyContactEmail(e.target.value)}
-          />
-          <h2>Household Information</h2>
-          <p>
-            This information will be used to help first responders determine the
-            number of people and pets that may need assistance during a disaster
-            situation.
-          </p>
-          <label>Number of Adults</label>
-          <input
-            type="number"
-            placeholder="2"
-            value={numberOfAdults}
-            onChange={(e) => setNumberOfAdults(e.target.value)}
-          />
-          <label>Number of Children</label>
-          <input
-            type="number"
-            placeholder="3"
-            value={numberOfChildren}
-            onChange={(e) => setNumberOfChildren(e.target.value)}
-          />
-          <label>Number of Pets</label>
-          <input
-            type="number"
-            placeholder="Number of Pets"
-            value={numberOfPets}
-            onChange={(e) => setNumberOfPets(e.target.value)}
-          />
-          <label>Significant Medical Conditions or Disabilities</label>
-          <input
-            type="text"
-            placeholder="Chronic Heart Disease, Asthma, Depression, etc."
-            value={medicalConditions}
-            onChange={(e) => setMedicalConditions(e.target.value)}
-          />
-        </div>
-        <div>
-          <button onClick={handleSave}>Save Info</button>
-          <button onClick={() => setModalVisible(false)}>Close modal</button>
-        </div>
+      <div className="flex flex-col">
+        <h2 className="text-xl font-bold">Personal Information</h2>
+        <label className="font-bold pl-2">First Name</label>
+        <input
+          type="text"
+          placeholder="Jane"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          className="border-gray-400 border-2 rounded p-1 pl-2"
+        />
+        <label className="font-bold pl-2">Last Name</label>
+        <input
+          type="text"
+          placeholder="Smith"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          className="border-gray-400 border-2 rounded p-1 pl-2"
+        />
+        {/* </div> */}
+        <label className="font-bold pl-2">Email</label>
+        <input
+          type="email"
+          placeholder="email@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="border-gray-400 border-2 rounded p-1 pl-2"
+        />
+        <label className="font-bold pl-2">Username</label>
+        <input
+          type="text"
+          placeholder="BuffaloBillsFan123"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className="border-gray-400 border-2 rounded p-1 pl-2"
+        />
+        <label className="font-bold pl-2">Address</label>
+        <input
+          type="text"
+          placeholder="123 Street Name, County, State Zip"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          className="border-gray-400 border-2 rounded p-1 pl-2"
+        />
+        <label className="font-bold pl-2">Account Type</label>
+        <Dropdown
+          menu={{ items, onClick }}
+          className="border-gray-400 border-2 rounded p-1 pl-2 w-100"
+        >
+          <Space>
+            Account Type <DownOutlined /> | {accountType}
+          </Space>
+        </Dropdown>
+        <label className="font-bold pl-2">Phone Number</label>
+        <input
+          type="tel"
+          placeholder="(123)-456-7890"
+          value={phoneNumber}
+          onChange={(e) => setPhoneNumber(e.target.value)}
+          className="border-gray-400 border-2 rounded p-1 pl-2"
+        />
+        <label className="font-bold pl-2">Date of Birth</label>
+        <input
+          type="date"
+          placeholder="January 1, 2000"
+          value={dob}
+          onChange={(e) => setDob(e.target.value)}
+          className="border-gray-400 border-2 rounded p-1 pl-2"
+        />
+        <br />
+
+        <h2 className="text-xl font-bold">Household Information</h2>
+        <p>
+          This information will be used to help first responders determine the
+          number of people and pets that may need assistance during a disaster
+          situation.
+        </p>
+        <label className="font-bold pl-2">Number of Adults</label>
+        <input
+          type="number"
+          placeholder="2"
+          value={numberOfAdults}
+          onChange={(e) => setNumberOfAdults(e.target.value)}
+          className="border-gray-400 border-2 rounded p-1 pl-2"
+        />
+        <label className="font-bold pl-2">Number of Children</label>
+        <input
+          type="number"
+          placeholder="3"
+          value={numberOfChildren}
+          onChange={(e) => setNumberOfChildren(e.target.value)}
+          className="border-gray-400 border-2 rounded p-1 pl-2"
+        />
+        <label className="font-bold pl-2">Number of Pets</label>
+        <input
+          type="number"
+          placeholder="Number of Pets"
+          value={numberOfPets}
+          onChange={(e) => setNumberOfPets(e.target.value)}
+          className="border-gray-400 border-2 rounded p-1 pl-2"
+        />
+        <br />
+
+        <h2 className="text-xl font-bold">Emergency Contact Information</h2>
+        <p>
+          This will be used only in emergency situations, such as being
+          incapacitated or unable to be reached during a disaster situation.
+        </p>
+        <label className="font-bold pl-2">Emergency Contact Name</label>
+        <input
+          type="text"
+          placeholder="John Smith"
+          value={emergencyContactName}
+          onChange={(e) => setEmergencyContactName(e.target.value)}
+          className="border-gray-400 border-2 rounded p-1 pl-2"
+        />
+        <label className="font-bold pl-2">Emergency Contact Number</label>
+        <input
+          type="tel"
+          placeholder="(123)-456-7890"
+          value={emergencyContactNumber}
+          onChange={(e) => setEmergencyContactNumber(e.target.value)}
+          className="border-gray-400 border-2 rounded p-1 pl-2"
+        />
+        <label className="font-bold pl-2">Emergency Contact Email</label>
+        <input
+          type="email"
+          placeholder="email@email.com"
+          value={emergencyContactEmail}
+          onChange={(e) => setEmergencyContactEmail(e.target.value)}
+          className="border-gray-400 border-2 rounded p-1 pl-2"
+        />
       </div>
     );
   };
@@ -307,32 +336,45 @@ const ProfileScreen = () => {
         </div>
         <br />
         <div
-          className="font-bold rounded-full h-auto w-auto flex bg-teal-300 p-2 cursor-pointer items-center justify-center"
+          className="font-bold rounded-full h-auto w-auto flex bg-blue-700 p-2 cursor-pointer items-center justify-center"
           onClick={() => setModalVisible(true)}
         >
           Edit account information
         </div>
+        <br />
       </div>
     );
   };
 
   const handleOk = () => {
     setModalVisible(false);
+    handleSave();
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-400 via-blue-500 to-blue-700">
-      <div className="flex w-full flex-row justify-around items-center mx-auto m-0">
+      <div className="flex flex-wrap w-full flex-row justify-around items-center mx-auto m-0">
         <div className="h-full flex flex-col justify-center items-center">
           <h1 className="text-2xl font-bold border-b-2 border-white">
             Your Public Profile
           </h1>
           <br />
           <ProfileCard
-            displayName={firstName + " " + lastName}
-            username={username}
-            // profilePic={null}
+            user={{
+              displayName: firstName + " " + lastName,
+              username: username,
+              profilePic: profilePicture,
+            }}
+            accountPage={true}
           />
+          <br />
+          <div
+            className="font-bold rounded-full h-auto w-auto flex bg-blue-700 p-2 cursor-pointer items-center justify-center"
+            onClick={() => router.push("/settings")}
+          >
+            Go to settings
+          </div>
+          <br />
         </div>
         <div className="h-full d-flex flex-column justify-content-center">
           {/* <h1 className="text-xl">Your Account Information</h1> */}
@@ -341,9 +383,26 @@ const ProfileScreen = () => {
       </div>
       <Modal
         open={modalVisible}
-        title="Edit Account Information"
-        onOk={() => handleOk()}
-        onCancel={() => setModalVisible(false)}
+        title={
+          <h2 className="text-xl font-bold border-b border-gray-400">
+            Edit Account Information
+          </h2>
+        }
+        footer={[
+          <Button
+            key="submit"
+            type="primary"
+            style={{ background: "#1677FF" }}
+            onMouseEnter={(e) => (e.target.style.background = "#4096ff")}
+            onMouseLeave={(e) => (e.target.style.background = "#1677FF")}
+            onClick={() => handleOk()}
+          >
+            Save
+          </Button>,
+          <Button key="back" onClick={() => setModalVisible(false)}>
+            Close
+          </Button>,
+        ]}
       >
         {modalContent()}
       </Modal>

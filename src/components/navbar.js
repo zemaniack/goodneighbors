@@ -4,7 +4,7 @@ import { getAuth } from "firebase/auth";
 import { app } from "../../firebaseConfig";
 
 const Navbar = () => {
-  const padding = "pr-5";
+  const buttonStyle = "pr-5 text-2xl";
   const [user, setUser] = useState(null);
   const auth = getAuth(app);
 
@@ -15,21 +15,18 @@ const Navbar = () => {
   }, [auth]);
 
   return (
-    <div className="w-full h-10 flex justify-between items-center bg-blue-500 fixed top-0 z-50 border-b-2 border-white">
-      <h1 className="text-2xl pl-10">Good NeighUBors</h1>
+    <div className="w-full flex justify-between items-center bg-blue-500 fixed top-0 z-50 border-b-2 border-white h-20">
+      <h1 className="text-4xl pl-10">Good NeighUBors</h1>
       {user && (
         <div className="links flex space-x-4">
-          <Link className={padding} href="/homepage">
+          <Link className={buttonStyle} href="/homepage">
             Home
           </Link>
-          <Link className={padding} href="/about">
+          <Link className={buttonStyle} href="/about">
             About
           </Link>
-          <Link className={padding} href="/profile">
+          <Link className={buttonStyle} href="/profile">
             Profile
-          </Link>
-          <Link className={padding} href="/settings">
-            Settings
           </Link>
         </div>
       )}
