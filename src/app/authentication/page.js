@@ -394,7 +394,7 @@ const AuthScreen = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-400 via-blue-500 to-blue-700">
+    <div className="flex items-center justify-center h-full bg-gradient-to-r from-blue-400 via-blue-500 to-blue-700">
       {action === "login" ? login() : createAccount()}
     </div>
   );

@@ -12,12 +12,13 @@ import {
   setDoc,
   getDocs,
   updateDoc,
+  onSnapshot,
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import ProfileCard from "../../components/profileCard";
-import { getUserInfo } from "../../hooks/getUserInfo";
 import { Button, Modal, Dropdown, Space } from "antd";
 import { DownOutlined, SmileOutlined } from "@ant-design/icons";
+import getUserInfo from "../../hooks/getUserInfo";
 
 const ProfileScreen = () => {
   const router = useRouter();
@@ -38,7 +39,8 @@ const ProfileScreen = () => {
   const [numberOfPets, setNumberOfPets] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [profilePicture, setProfilePicture] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [userInfo, setUserInfo] = useState(null);
 
   // Modal usage state
   const [modalVisible, setModalVisible] = useState(false);
@@ -65,7 +67,6 @@ const ProfileScreen = () => {
 
   // Instantiation of auth
   const auth = getAuth(app);
-  console.log(auth.currentUser);
 
   // When page loads, get user information
   useEffect(() => {
@@ -92,6 +93,9 @@ const ProfileScreen = () => {
         } else {
           console.log("No such document!");
         }
+
+        setUserInfo(await getUserInfo());
+        setLoading(false);
       }
     };
     auth.onAuthStateChanged(loadData);
@@ -101,7 +105,6 @@ const ProfileScreen = () => {
     const userRef = collection(db, "users");
     const q = query(userRef, where("uid", "==", auth.currentUser.uid));
     const querySnapshot = await getDocs(q);
-    console.log("snap", querySnapshot);
     if (!querySnapshot.empty) {
       return querySnapshot.docs[0];
     }
@@ -132,20 +135,29 @@ const ProfileScreen = () => {
       lastName: lastName,
     })
       .then(() => {
-        console.log("Document successfully written!");
-        router.push("/Profile");
+        setUserInfo((prev) => {
+          return {
+            ...prev,
+            email: email,
+            username: username,
+            address: address,
+            accountType: accountType,
+            phoneNumber: phoneNumber,
+            dob: dob,
+            emergencyContactName: emergencyContactName,
+            emergencyContactNumber: emergencyContactNumber,
+            emergencyContactEmail: emergencyContactEmail,
+            numberOfChildren: numberOfChildren,
+            numberOfAdults: numberOfAdults,
+            numberOfPets: numberOfPets,
+            firstName: firstName,
+            lastName: lastName,
+          };
+        });
       })
       .catch((error) => {
         console.error("Error writing document: ", error);
       });
-  };
-
-  const uploadPhoto = async () => {
-    const uri = await pickImage();
-    if (uri !== null) {
-      const url = await uploadImage(uri);
-      setProfilePicture(url);
-    }
   };
 
   const modalContent = () => {
@@ -352,21 +364,14 @@ const ProfileScreen = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-400 via-blue-500 to-blue-700">
+    <div className="flex items-center justify-center h-full bg-gradient-to-r from-blue-400 via-blue-500 to-blue-700">
       <div className="flex flex-wrap w-full flex-row justify-around items-center mx-auto m-0">
         <div className="h-full flex flex-col justify-center items-center">
           <h1 className="text-2xl font-bold border-b-2 border-white">
             Your Public Profile
           </h1>
           <br />
-          <ProfileCard
-            user={{
-              displayName: firstName + " " + lastName,
-              username: username,
-              profilePic: profilePicture,
-            }}
-            accountPage={true}
-          />
+          {!loading && <ProfileCard user={userInfo} accountPage={true} />}
           <br />
           <div
             className="font-bold rounded-full h-auto w-auto flex bg-blue-700 p-2 cursor-pointer items-center justify-center"

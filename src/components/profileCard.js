@@ -1,44 +1,69 @@
+"use client";
 import React from "react";
 import { FaUser } from "react-icons/fa";
 import { MdModeEdit } from "react-icons/md";
 import { db, storage } from "../../firebaseConfig";
-import { useEffect } from "react";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import {
+  collection,
+  query,
+  where,
+  doc,
+  setDoc,
+  getDocs,
+  updateDoc,
+  onSnapshot,
+} from "firebase/firestore";
+import { useState, useEffect } from "react";
 
 const ProfileCard = ({ user, accountPage = false }) => {
-  // Get the user's display name, username, and profile pic
-  // const user = props.userProp;
-  // const accountPage = props.accountPageProp;
+  const [userInfo, setUserInfo] = useState({});
 
-  const displayName = user.displayName;
-  const username = user.username;
-  let profilePic = user.profilePic;
+  useEffect(() => {
+    setUserInfo(user);
+  }, [user]);
+
+  const getSnapshot = async () => {
+    const userRef = collection(db, "users");
+    const q = query(userRef, where("uid", "==", user.uid));
+    const querySnapshot = await getDocs(q);
+    console.log("snap", querySnapshot);
+    if (!querySnapshot.empty) {
+      return querySnapshot.docs[0];
+    }
+    return null;
+  };
 
   // Function to edit the profile picture
   const editProfilePicture = async () => {
-    // get the file from the user
     const file = document.getElementById("profilePicInput").files[0];
-
-    // check if a file was selected
     if (!file) {
       console.error("No file selected");
       return;
     }
 
-    // create a reference to the location where you want to upload the file
-    const fileRef = ref(storage, `profilePics/${file.name}`);
+    const storageRef = ref(storage, `profilePics/${file.name}`);
 
     // upload the file to Firebase Storage
     try {
-      const snapshot = await uploadBytesResumable(storageRef, file);
+      const snapshot = await uploadBytes(storageRef, file);
       console.log("Uploaded a blob or file!");
 
       // set the url of the image to the user profile in the user collection
       const url = await getDownloadURL(storageRef);
-      const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, {
+      const docSnap = await getSnapshot();
+      await updateDoc(doc(db, "users", docSnap.id), {
         profilePic: url,
-      });
+      })
+        .then(() => {
+          console.log("Document successfully updated!");
+          setUserInfo((prev) => {
+            return { ...prev, profilePic: url };
+          });
+        })
+        .catch((error) => {
+          console.error("Error updating document: ", error);
+        });
     } catch (error) {
       console.error("Error uploading file:", error);
     }
@@ -87,19 +112,35 @@ const ProfileCard = ({ user, accountPage = false }) => {
       >
         <div
           style={{
+            width: "100px",
+            height: "100px",
             borderRadius: "50%",
             overflow: "hidden",
             border: "1px solid white",
-            position: "absolute",
+            position: "relative",
             top: "50%",
             left: "50%",
-            transform: "translate(-50%, -50%)",
+            transform: "translate(-50%, 0%)",
           }}
         >
-          {profilePic ? (
-            <img src={profilePic} alt="Profile" style={{ width: "100%" }} />
+          {userInfo?.profilePic ?? false ? (
+            <img
+              src={userInfo.profilePic}
+              alt="Profile"
+              style={{ width: "100%" }}
+            />
           ) : (
-            <FaUser />
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                width: "100%",
+                height: "100%",
+              }}
+            >
+              <FaUser />
+            </div>
           )}
           <input type="file" id="profilePicInput" style={{ display: "none" }} />
         </div>
@@ -110,8 +151,8 @@ const ProfileCard = ({ user, accountPage = false }) => {
               color: "white",
               fontSize: "0.5em",
               position: "absolute",
-              top: "-1em",
-              right: "1em",
+              top: "0",
+              right: "0.1em",
             }}
             onClick={openFileSelection}
           >
@@ -120,10 +161,13 @@ const ProfileCard = ({ user, accountPage = false }) => {
         ) : null}
       </div>
       <div className="p-4">
-        <br />
-        <div className="text-lg text-white font-bold ">{displayName}</div>
+        <div className="text-lg text-white font-bold ">
+          {userInfo
+            ? userInfo.firstName + " " + userInfo.lastName
+            : "loading..."}
+        </div>
         <div className="text-sm text-white">
-          {username ? "@" + username : null}
+          @{userInfo ? userInfo.username : "loading..."}
         </div>
       </div>
     </div>
