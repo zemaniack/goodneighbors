@@ -4,7 +4,7 @@ import { getAuth } from "firebase/auth";
 import { app } from "../../firebaseConfig";
 
 const Navbar = () => {
-  const buttonStyle = "pr-5 text-2xl";
+  const buttonStyle = "pr-5 text-2xl hover:text-blue-600";
   const [user, setUser] = useState(null);
   const auth = getAuth(app);
 
