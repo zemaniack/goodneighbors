@@ -22,6 +22,7 @@ import { DownOutlined, SmileOutlined } from "@ant-design/icons";
 import getUserInfo from "../../hooks/getUserInfo";
 import fetchNeeds from "@/hooks/fetchNeeds";
 import { MdModeEdit } from "react-icons/md";
+import getCoordinates from "../../hooks/coordinatesFetcher";
 
 const ProfileScreen = () => {
   const router = useRouter();
@@ -190,6 +191,8 @@ const ProfileScreen = () => {
   };
 
   const handleNewNeed = async () => {
+    let coords = await getCoordinates(address);
+    console.log(coords);
     const needRef = collection(db, "needs");
     const newNeed = await addDoc(needRef, {
       uid: auth.currentUser.uid,
@@ -198,6 +201,7 @@ const ProfileScreen = () => {
       urgency: urgency,
       dateRequested: new Date(),
       fulfillment: false,
+      location: coords,
     })
       .then((docRef) => {
         console.log("Document successfully written!");
@@ -215,6 +219,7 @@ const ProfileScreen = () => {
             urgency: urgency,
             dateRequested: new Date(),
             fulfillment: false,
+            location: coords,
           },
         ]);
       })
@@ -239,26 +244,30 @@ const ProfileScreen = () => {
             }}
           >
             <h2 className="text-xl font-bold">Personal Information</h2>
-            <p className="text-l">First Name: {firstName}</p>
-            <p>Last Name: {lastName}</p>
-            <p>Email: {email}</p>
-            <p>Username: {username}</p>
-            <p>Address: {address}</p>
-            <p>Account Type: {accountType}</p>
-            <p>Phone Number: {phoneNumber}</p>
-            <p>Date of Birth: {dob}</p>
-          </div>
-          <br />
-          <div
-            className="rounded-lg shadow-lg overflow-hidden p-5"
-            style={{
-              backgroundColor: "rgba(255, 255, 255, 0.1)",
-              // borderRadius: "5px",
-            }}
-          >
-            <h2 className="text-xl font-bold">Household Information</h2>
-            <p>Number of Adults: {numberOfAdults}</p>
-            <p>Number of Children: {numberOfChildren}</p>
+            <p>
+              <span className="font-bold">First Name:</span> {firstName}
+            </p>
+            <p>
+              <span className="font-bold">Last Name:</span> {lastName}
+            </p>
+            <p>
+              <span className="font-bold">Email:</span> {email}
+            </p>
+            <p>
+              <span className="font-bold">Username:</span> {username}
+            </p>
+            <p>
+              <span className="font-bold">Address:</span> {address}
+            </p>
+            <p>
+              <span className="font-bold">Account Type:</span> {accountType}
+            </p>
+            <p>
+              <span className="font-bold">Phone Number:</span> {phoneNumber}
+            </p>
+            <p>
+              <span className="font-bold">Date of Birth:</span> {dob}
+            </p>
           </div>
           <br />
           <div
@@ -269,9 +278,18 @@ const ProfileScreen = () => {
             }}
           >
             <h2 className="text-xl font-bold">Emergency Contact Information</h2>
-            <p>Emergency Contact Name: {emergencyContactName}</p>
-            <p>Emergency Contact Number: {emergencyContactNumber}</p>
-            <p>Emergency Contact Email: {emergencyContactEmail}</p>
+            <p>
+              <span className="font-bold">Emergency Contact Name:</span>{" "}
+              {emergencyContactName}
+            </p>
+            <p>
+              <span className="font-bold">Emergency Contact Number:</span>{" "}
+              {emergencyContactNumber}
+            </p>
+            <p>
+              <span className="font-bold">Emergency Contact Email:</span>{" "}
+              {emergencyContactEmail}
+            </p>
           </div>
           <br />
           <div
@@ -329,20 +347,20 @@ const ProfileScreen = () => {
   const UserNeeds = () => {
     return (
       <div
-        className="h-full p-10 flex flex-col justify-center align-center items-center flex-wrap overflow-auto"
-        style={{ width: "calc(100% - (100% mod elementWidth)" }}
+        className="h-full p-10 flex flex-col justify-center align-center items-center flex-wrap"
+        style={{ width: "60%" }}
       >
         <h1 className="text-2xl font-bold border-b-2 border-white">
           Your Needs
         </h1>
         <br />
         <div
-          className="rounded-lg shadow-lg overflow-hidden p-5 m-2 w-auto"
+          className="rounded-lg shadow-lg overflow-hidden p-5 m-2 w-full"
           style={{
             backgroundColor: "rgba(255, 255, 255, 0.1)",
           }}
         >
-          <div className="grid grid-flow-row-dense grid-cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
+          <div className="flex flex-wrap overflow-auto">
             {needs.map((need) => {
               let date;
               if (need.dateRequested instanceof Date) {
@@ -355,8 +373,9 @@ const ProfileScreen = () => {
               const dateString = date.toISOString().split("T")[0];
               return (
                 <div
-                  className="flex flex-col justify-around rounded-lg shadow-lg overflow-hidden p-2 m-2"
+                  className="flex flex-col flex-grow justify-around rounded-lg shadow-lg overflow-hidden p-2 m-2"
                   style={{
+                    maxWidth: "300px",
                     backgroundColor: "rgba(255, 255, 255, 0.1)",
                     width: "250px",
                   }}
@@ -365,10 +384,21 @@ const ProfileScreen = () => {
                     {need.name}
                     <MdModeEdit />
                   </h2>
-                  <p>{need.description}</p>
-                  <p>Urgency: {need.urgency}</p>
-                  <p>Date Requested: {dateString}</p>
-                  <p>Fulfilled: {need.fulfillment ? "Yes" : "No"}</p>
+                  <div>
+                    <span className="font-bold">Description:</span>{" "}
+                    {need.description}
+                  </div>
+                  <div>
+                    <span className="font-bold">Urgency:</span> {need.urgency}
+                  </div>
+                  <div>
+                    <span className="font-bold">Date Requested:</span>{" "}
+                    {dateString}
+                  </div>
+                  <div>
+                    <span className="font-bold">Fulfilled:</span>{" "}
+                    {need.fulfillment ? "Yes" : "No"}
+                  </div>
                 </div>
               );
             })}
@@ -458,9 +488,15 @@ const ProfileScreen = () => {
               className="border-gray-400 border-2 rounded p-1 pl-2"
             />
             <label className="font-bold pl-2">Address</label>
+            <p>
+              We need your address to be able to recieve emergency and disaster
+              alerts for your area and assistance from volunteers around your
+              neighborhood. This information will only be visible to
+              authorities.
+            </p>
             <input
               type="text"
-              placeholder="123 Street Name, County, State Zip"
+              placeholder="123 Street Name, City, State, Zip"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               className="border-gray-400 border-2 rounded p-1 pl-2"
@@ -488,38 +524,6 @@ const ProfileScreen = () => {
               placeholder="January 1, 2000"
               value={dob}
               onChange={(e) => setDob(e.target.value)}
-              className="border-gray-400 border-2 rounded p-1 pl-2"
-            />
-            <br />
-
-            <h2 className="text-xl font-bold">Household Information</h2>
-            <p>
-              This information will be used to help first responders determine
-              the number of people and pets that may need assistance during a
-              disaster situation.
-            </p>
-            <label className="font-bold pl-2">Number of Adults</label>
-            <input
-              type="number"
-              placeholder="2"
-              value={numberOfAdults}
-              onChange={(e) => setNumberOfAdults(e.target.value)}
-              className="border-gray-400 border-2 rounded p-1 pl-2"
-            />
-            <label className="font-bold pl-2">Number of Children</label>
-            <input
-              type="number"
-              placeholder="3"
-              value={numberOfChildren}
-              onChange={(e) => setNumberOfChildren(e.target.value)}
-              className="border-gray-400 border-2 rounded p-1 pl-2"
-            />
-            <label className="font-bold pl-2">Number of Pets</label>
-            <input
-              type="number"
-              placeholder="Number of Pets"
-              value={numberOfPets}
-              onChange={(e) => setNumberOfPets(e.target.value)}
               className="border-gray-400 border-2 rounded p-1 pl-2"
             />
             <br />

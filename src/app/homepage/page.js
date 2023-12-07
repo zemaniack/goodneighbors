@@ -3,22 +3,32 @@ import React from "react";
 import { getAuth } from "firebase/auth";
 import { app } from "../../../firebaseConfig";
 import getUserInfo from "../../hooks/getUserInfo";
+import fetchNeeds from "@/hooks/fetchNeeds";
+
 const HomeScreen = () => {
   const [userInfo, setUserInfo] = React.useState(null);
   const [token, setToken] = React.useState(null);
   const [mainContent, setMainContent] = React.useState("dashboard");
+  const [needs, setNeeds] = React.useState(null);
 
   React.useEffect(() => {
     async function loadUserInfo() {
       const userInformation = await getUserInfo();
-      // setUserInfo(userInformation);
-      // pageContent();
+      setUserInfo(userInformation);
+      const needs = await fetchNeeds();
+      setNeeds(needs);
       console.log(userInfo);
       // const token = await generateJwt();
     }
     loadUserInfo();
     console.log(userInfo);
   }, []);
+
+  // Rerender when userInfo or needs change
+  React.useEffect(() => {
+    console.log(userInfo);
+    console.log(needs);
+  }, [userInfo, needs]);
 
   const pageContent = () => {
     return (
@@ -36,7 +46,7 @@ const HomeScreen = () => {
               Send an Alert
             </h1>
             <br />
-            <div></div>
+            <div className=""></div>
           </div>
         </div>
         <div
@@ -97,7 +107,66 @@ const HomeScreen = () => {
   };
 
   const userNeedsContent = () => {
-    return <div>User Needs</div>;
+    return (
+      <div className="flex flex-wrap w-full h-full overflow-auto">
+        {needs.map((need) => {
+          let date;
+          if (need.dateRequested instanceof Date) {
+            date = need.dateRequested;
+          } else if (need.dateRequested?.toDate) {
+            date = need.dateRequested.toDate();
+          } else if (
+            need.dateRequested &&
+            !isNaN(Date.parse(need.dateRequested))
+          ) {
+            date = new Date(need.dateRequested);
+          } else {
+            console.error(`Invalid date: ${need.dateRequested}`);
+            return null; // Skip this item if the date is invalid
+          }
+          const dateString = date.toISOString().split("T")[0];
+          return (
+            <div
+              className="flex flex-col flex-grow justify-around rounded-lg shadow-lg overflow-hidden p-2 m-2 h-min"
+              style={{
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                maxWidth: "300px",
+              }}
+            >
+              <h2 className="text-xl font-bold border-b-2 border-white flex flex-row justify-between">
+                {need.name}
+              </h2>
+              <div>
+                <span className="font-bold">Description:</span>{" "}
+                {need.description}
+              </div>
+              <div>
+                <span className="font-bold">Urgency:</span> {need.urgency}
+              </div>
+              <div>
+                <span className="font-bold">Date Requested:</span> {dateString}
+              </div>
+              <div>
+                <span className="font-bold">Fulfilled:</span>{" "}
+                {need.fulfillment ? "Yes" : "No"}
+              </div>
+              {/* <div>
+                <span className="font-bold">Fulfilled By:</span>{" "}
+                {need.fulfillment}
+              </div>
+              <div>
+                <span className="font-bold">Fulfilled Date:</span>{" "}
+                {need.fulfillmentDate}
+              </div> */}
+              <div>
+                <span className="font-bold">Location:</span> {need.location.lat}
+                , {need.location.lng}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
   };
 
   const tableauContent = () => {
