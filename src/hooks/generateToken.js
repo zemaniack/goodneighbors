@@ -1,16 +1,18 @@
 const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
 
+
 const generateJwt = async () => {
   // Replace the example values below (remove the brackets).
   // Store secrets securely based on your team's best practices.
   // See: https://help.tableau.com/current/online/en-us/connected_apps_direct.htm
 
-  const secret = "eebcab3e-c40c-4166-83ff-611731b2fe5b";
-  const secretId = "Qd9/t67wOqlyRmKVyNwewcrJ531iTsyFwPMx7KnITuE=";
-  const clientId = "5a33df84-4b11-45b7-9cfc-6b63630ffdef";
-  const scopes = ["tableau:views:embed", "tableau:views:embed_authoring"];
-  const userId = "aneshmut@buffalo.edu";
+  const secret = "12edf817-96db-475f-a73a-8c532efdb930";
+  const secretId = "8Gg0ga6p9wVKh4AEgxcoeAnN6TmsOQSpRLN58x5n3CU=";
+  const clientId = "d6952b3b-5c4d-4fe4-a3e5-0b706daca150";
+  //const scopes = ["tableau:views:embed", "tableau:views:embed_authoring"];
+  const scopes = ["tableau:views:embed","tableau:views:embed_authoring"];
+  const userId = "tablea9555@gmail.com";
   const tokenExpiryInMinutes = 10; // Max of 10 minutes.
 
   const userAttributes = {
@@ -39,7 +41,7 @@ const generateJwt = async () => {
   };
 
   const token = jwt.sign(data, secret, options);
-  console.log(token);
+  console.log("Generated token: ", token);
 
   return token;
 };

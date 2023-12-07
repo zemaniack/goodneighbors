@@ -25,6 +25,8 @@ const getUserInfo = async () => {
     }
   });
 
+  console.log("getUserInfo returning");
+
   return userData;
 };
 
