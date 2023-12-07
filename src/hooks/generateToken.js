@@ -7,11 +7,15 @@ const generateJwt = async () => {
   // Store secrets securely based on your team's best practices.
   // See: https://help.tableau.com/current/online/en-us/connected_apps_direct.htm
 
-  const secret = "12edf817-96db-475f-a73a-8c532efdb930";
-  const secretId = "8Gg0ga6p9wVKh4AEgxcoeAnN6TmsOQSpRLN58x5n3CU=";
+  //const secret = "12edf817-96db-475f-a73a-8c532efdb930";
+  //const secretId = "8Gg0ga6p9wVKh4AEgxcoeAnN6TmsOQSpRLN58x5n3CU=";
+
+  const secretId = "12edf817-96db-475f-a73a-8c532efdb930";
+  const secretValue = "8Gg0ga6p9wVKh4AEgxcoeAnN6TmsOQSpRLN58x5n3CU="
+
   const clientId = "d6952b3b-5c4d-4fe4-a3e5-0b706daca150";
   //const scopes = ["tableau:views:embed", "tableau:views:embed_authoring"];
-  const scopes = ["tableau:views:embed","tableau:views:embed_authoring"];
+  const scopes = ["tableau:views:embed","tableau:views:embed_authoring","tableau:ask_data:embed"];
   const userId = "tablea9555@gmail.com";
   const tokenExpiryInMinutes = 10; // Max of 10 minutes.
 
@@ -40,9 +44,8 @@ const generateJwt = async () => {
     ...userAttributes,
   };
 
-  const token = jwt.sign(data, secret, options);
-  console.log("Generated token: ", token);
-
+  //const token = jwt.sign(data, secret, options);
+  const token = jwt.sign(data, secretValue, options);
   return token;
 };
 
