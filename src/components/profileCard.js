@@ -98,7 +98,6 @@ const ProfileCard = ({ user, accountPage = false }) => {
       className="rounded-lg shadow-lg overflow-hidden p-5"
       style={{
         backgroundColor: "rgba(255, 255, 255, 0.1)",
-        // borderRadius: "5px",
       }}
     >
       <br />

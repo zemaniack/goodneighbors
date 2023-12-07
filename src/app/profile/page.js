@@ -49,6 +49,7 @@ const ProfileScreen = () => {
   const [needName, setNeedName] = useState("");
   const [needDescription, setNeedDescription] = useState("");
   const [needs, setNeeds] = useState([]);
+  const [needType, setNeedType] = useState("");
 
   // Modal usage state
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -87,6 +88,29 @@ const ProfileScreen = () => {
     {
       key: "3",
       label: "Urgent",
+    },
+  ];
+
+  const needTypeItems = [
+    {
+      key: "1",
+      label: "Food",
+    },
+    {
+      key: "2",
+      label: "Water",
+    },
+    {
+      key: "3",
+      label: "Shelter",
+    },
+    {
+      key: "4",
+      label: "Medical",
+    },
+    {
+      key: "5",
+      label: "Other",
     },
   ];
 
@@ -145,6 +169,10 @@ const ProfileScreen = () => {
     setUrgency(urgencyItems[key - 1].label);
   };
 
+  const onClickNeedType = ({ key }) => {
+    setNeedType(needTypeItems[key - 1].label);
+  };
+
   const handleSave = async () => {
     const docSnap = await getSnapshot();
 
@@ -191,6 +219,7 @@ const ProfileScreen = () => {
   };
 
   const handleNewNeed = async () => {
+    // categories: ["food", "water", "shelter", "medical", "other"]
     let coords = await getCoordinates(address);
     console.log(coords);
     const needRef = collection(db, "needs");
@@ -201,13 +230,16 @@ const ProfileScreen = () => {
       urgency: urgency,
       dateRequested: new Date(),
       fulfillment: false,
-      location: coords,
+      lat: coords.lat,
+      lng: coords.lng,
+      category: needType,
     })
       .then((docRef) => {
         console.log("Document successfully written!");
         setNeedName("");
         setNeedDescription("");
         setUrgency("");
+        setNeedType("");
         // Update the needs state with the new need
         setNeeds((prevNeeds) => [
           ...prevNeeds,
@@ -219,7 +251,9 @@ const ProfileScreen = () => {
             urgency: urgency,
             dateRequested: new Date(),
             fulfillment: false,
-            location: coords,
+            lat: coords.lat,
+            lng: coords.lng,
+            category: needType,
           },
         ]);
       })
@@ -230,7 +264,10 @@ const ProfileScreen = () => {
 
   const AccountInfo = () => {
     return (
-      <div className="h-full flex flex-col justify-center items-center p-10">
+      <div
+        className="h-full flex flex-col justify-start items-center"
+        style={{ width: "20%" }}
+      >
         <h1 className="text-2xl font-bold border-b-2 border-white">
           Account Information
         </h1>
@@ -321,7 +358,10 @@ const ProfileScreen = () => {
 
   const PublicProfile = () => {
     return (
-      <div className="h-full flex flex-col justify-center items-center p-10">
+      <div
+        className="h-full flex flex-col justify-start items-center"
+        // style={{ width: "20%" }}
+      >
         <h1 className="text-2xl font-bold border-b-2 border-white">
           Your Public Profile
         </h1>
@@ -347,7 +387,7 @@ const ProfileScreen = () => {
   const UserNeeds = () => {
     return (
       <div
-        className="h-full p-10 flex flex-col justify-center align-center items-center flex-wrap"
+        className="h-full flex flex-col justify-start align-center items-center flex-wrap"
         style={{ width: "60%" }}
       >
         <h1 className="text-2xl font-bold border-b-2 border-white">
@@ -355,12 +395,13 @@ const ProfileScreen = () => {
         </h1>
         <br />
         <div
-          className="rounded-lg shadow-lg overflow-hidden p-5 m-2 w-full"
+          className="rounded-lg shadow-lg overflow-hidden p-5 w-full"
           style={{
             backgroundColor: "rgba(255, 255, 255, 0.1)",
+            height: "80%",
           }}
         >
-          <div className="flex flex-wrap overflow-auto">
+          <div className="flex flex-wrap justify-around overflow-auto">
             {needs.map((need) => {
               let date;
               if (need.dateRequested instanceof Date) {
@@ -375,7 +416,7 @@ const ProfileScreen = () => {
                 <div
                   className="flex flex-col flex-grow justify-around rounded-lg shadow-lg overflow-hidden p-2 m-2"
                   style={{
-                    maxWidth: "300px",
+                    maxWidth: "400px",
                     backgroundColor: "rgba(255, 255, 255, 0.1)",
                     width: "250px",
                   }}
@@ -421,8 +462,8 @@ const ProfileScreen = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-full bg-gradient-to-r from-blue-400 via-blue-500 to-blue-700 overflow-y-auto">
-      <div className="flex flex-row w-full justify-around items-start mx-auto m-0">
+    <div className="h-full bg-gradient-to-r from-blue-400 via-blue-500 to-blue-700 overflow-y-auto">
+      <div className="flex flex-row w-full h-full justify-around items-start mx-auto m-0">
         <PublicProfile />
         <AccountInfo />
         <UserNeeds />
@@ -511,6 +552,10 @@ const ProfileScreen = () => {
               </Space>
             </Dropdown>
             <label className="font-bold pl-2">Phone Number</label>
+            <p>
+              We need your phone number to be able to recieve emergency alerts,
+              and to connect you to volunteers and authorities in your area.
+            </p>
             <input
               type="tel"
               placeholder="(123)-456-7890"
@@ -605,6 +650,15 @@ const ProfileScreen = () => {
             >
               <Space>
                 Urgency <DownOutlined /> | {urgency}
+              </Space>
+            </Dropdown>
+            <h2 className="text-l font-bold">Type of need</h2>
+            <Dropdown
+              menu={{ items: needTypeItems, onClick: onClickNeedType }}
+              className="border-gray-400 border-2 rounded p-1 pl-2 w-100"
+            >
+              <Space>
+                Need Category <DownOutlined /> | {needType}
               </Space>
             </Dropdown>
           </div>

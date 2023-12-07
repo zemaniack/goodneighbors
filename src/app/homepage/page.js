@@ -159,8 +159,8 @@ const HomeScreen = () => {
                 {need.fulfillmentDate}
               </div> */}
               <div>
-                <span className="font-bold">Location:</span> {need.location.lat}
-                , {need.location.lng}
+                <span className="font-bold">Location:</span> {need.lat},{" "}
+                {need.lng}
               </div>
             </div>
           );

@@ -4,20 +4,24 @@ import XLSX from "xlsx";
 import { db } from "../firebaseConfig";
 
 const exportFirestoreDataToExcel = async () => {
-  const db = firebase.firestore();
-
   const fetchDataFromFirestore = async () => {
     try {
-      const snapshot = await db.collection("yourCollection").get();
+      const snapshot = await db.collection("needs").get();
       const data = [];
 
       snapshot.forEach((doc) => {
         // Assuming your Firestore data structure has fields 'field1', 'field2', etc.
         const docData = doc.data();
         data.push({
-          Field1: docData.field1,
-          Field2: docData.field2,
-          // Add more fields as needed
+          dateRequested: docData.dateRequested,
+          description: docData.description,
+          fulfillment: docData.fulfillment,
+          lat: docData.lat,
+          lng: docData.lng,
+          urgency: docData.urgency,
+          name: docData.name,
+          uid: docData.uid,
+          category: docData.category,
         });
       });
 
