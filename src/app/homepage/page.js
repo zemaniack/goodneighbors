@@ -8,30 +8,28 @@ import { app } from "../../../firebaseConfig";
 import getUserInfo from "../../hooks/getUserInfo";
 // import { WebView } from "react-native-webview";
 import generateJwt from "../../hooks/generateToken";
-import Script from "next/script";
 
 const HomeScreen = () => {
   const [userInfo, setUserInfo] = React.useState(null);
   const [token, setToken] = React.useState(null);
 
-  React.useEffect(() => {
+  React.useEffect(() => { // loads the Tableau Embedding API for embedding the dashboard.
     async function loadTableauLibrary() {
       
-      const script = document.createElement('script');
+      const script = document.createElement('script'); // create a script element for the tableau
       script.type = "module";
-      script.src = 'https://public.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js';
+      script.src = "https://embedding.tableauusercontent.com/tableau.embedding.3.1.0.min.js";
       //script.async = true;
 
+      /*
       script.onload = () => {
         // Once the Tableau script has loaded, you can use the tableau API here
-        const containerDiv = document.getElementById('tableauViz');
         const options = {
           hideTabs: true,
           //toolbarPosition: tableau.ToolbarPosition.Bottom,
         };
-
-        //const viz = new tableau.Viz(containerDiv, 'https://public.tableau.com/views/Superstore_embedded_800x800/Overview', options);
-    };
+      };
+      */
 
     document.head.appendChild(script);
 
@@ -103,37 +101,19 @@ const HomeScreen = () => {
             width="1000"
             height="1000"
             hide-tabs="false"
-            src="https://prod-useast-b.online.tableau.com/t/communityserver95/views/map/Dashboard1"
+            src={tableauUrl}
             device="Desktop"
             toolbar="bottom"
             token= {token}
             >   
-            </tableau-viz>
+          </tableau-viz>
           </div>
         );
       }
     }
   };
-  
-  // Public dashboard for testing.
-  const pageContent_old = () => {
-    console.log("loading page content with token: ", token);
-    return (
-      <div>
-        <p>Good job creating your account!</p>
-        
-        <tableau-viz id="tableauViz"       
-          src='https://public.tableau.com/views/Superstore_embedded_800x800/Overview'      
-          toolbar="bottom" hide-tabs>
-        </tableau-viz>
 
-        <p>Community needs dashboard</p>
-      </div>
-    );
-  };
-
-
-  // actual
+  // Loads the actual tableau dashboard. No user authorization.
   const pageContent = () => {
     console.log("loading page content with token: ", token);
     return (
@@ -145,23 +125,22 @@ const HomeScreen = () => {
             width="1000"
             height="1000"
             hide-tabs="false"
-            src="https://prod-useast-b.online.tableau.com/t/communityserver95/views/map/Dashboard1"
+            src={tableauUrl}
             device="Desktop"
             toolbar="bottom"
             token= {token}
             >   
-            </tableau-viz>
+          </tableau-viz>
 
-        <p>Community needs dashboard</p>
       </div>
     );
   };
 
+  // old url
   //const tableauUrl =
     //"https://prod-useast-b.online.tableau.com/t/communitydashboard/views/disabilities_communities/Dashboard2/b347fd8f-9ae1-4fc9-8c1a-867b5bdd6120/8c879fdb-6fd7-46a4-bb88-a01be172d755?:embed=yes";
 
   const tableauUrl = "https://prod-useast-b.online.tableau.com/t/communityserver95/views/map/Dashboard1" // new url
-  const publicUrl = "https://public.tableau.com/views/Superstore_embedded_800x800/Overview"
   
 
   return (
