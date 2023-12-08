@@ -2,7 +2,6 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { app, db } from "../../firebaseConfig";
 
 const fetchNeeds = async (userId = null) => {
-  console.log("here");
   let needsList = [];
   if (userId) {
     const needsRef = collection(db, "needs");
@@ -14,7 +13,6 @@ const fetchNeeds = async (userId = null) => {
     const needs = await getDocs(needsRef);
     needsList = needs.docs.map((doc) => doc.data());
   }
-  console.log(needsList);
   return needsList;
 };
 
