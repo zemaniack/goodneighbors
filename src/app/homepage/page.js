@@ -108,63 +108,54 @@ const HomeScreen = () => {
 
   const userNeedsContent = () => {
     return (
-      <div className="flex flex-wrap w-full h-full overflow-auto">
-        {needs.map((need) => {
-          let date;
-          if (need.dateRequested instanceof Date) {
-            date = need.dateRequested;
-          } else if (need.dateRequested?.toDate) {
-            date = need.dateRequested.toDate();
-          } else if (
-            need.dateRequested &&
-            !isNaN(Date.parse(need.dateRequested))
-          ) {
-            date = new Date(need.dateRequested);
-          } else {
-            console.error(`Invalid date: ${need.dateRequested}`);
-            return null; // Skip this item if the date is invalid
-          }
-          const dateString = date.toISOString().split("T")[0];
-          return (
-            <div
-              className="flex flex-col flex-grow justify-around rounded-lg shadow-lg overflow-hidden p-2 m-2 h-min"
-              style={{
-                backgroundColor: "rgba(255, 255, 255, 0.1)",
-                maxWidth: "300px",
-              }}
-            >
-              <h2 className="text-xl font-bold border-b-2 border-white flex flex-row justify-between">
-                {need.name}
-              </h2>
-              <div>
-                <span className="font-bold">Description:</span>{" "}
-                {need.description}
+      <div className="overflow-hidden p-5 w-full overflow-y-auto h-[70vh]">
+        <div className="flex flex-wrap justify-around">
+          {needs.map((need) => {
+            let date;
+            if (need.dateRequested instanceof Date) {
+              date = need.dateRequested;
+            } else if (need.dateRequested?.toDate) {
+              date = need.dateRequested.toDate();
+            } else if (
+              need.dateRequested &&
+              !isNaN(Date.parse(need.dateRequested))
+            ) {
+              date = new Date(need.dateRequested);
+            } else {
+              console.error(`Invalid date: ${need.dateRequested}`);
+              return null; // Skip this item if the date is invalid
+            }
+            const dateString = date.toISOString().split("T")[0];
+            return (
+              <div
+                className="flex flex-col flex-grow justify-around rounded-lg shadow-lg p-2 m-2 h-min"
+                style={{
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  maxWidth: "300px",
+                }}
+              >
+                <h2 className="text-xl font-bold border-b-2 border-white flex flex-row justify-between">
+                  {need.needName}
+                </h2>
+                <div>
+                  <span className="font-bold">Description:</span>{" "}
+                  {need.description}
+                </div>
+                <div>
+                  <span className="font-bold">Urgency:</span> {need.urgency}
+                </div>
+                <div>
+                  <span className="font-bold">Date Requested:</span>{" "}
+                  {dateString}
+                </div>
+                <div>
+                  <span className="font-bold">Fulfilled:</span>{" "}
+                  {need.fulfillment ? "Yes" : "No"}
+                </div>
               </div>
-              <div>
-                <span className="font-bold">Urgency:</span> {need.urgency}
-              </div>
-              <div>
-                <span className="font-bold">Date Requested:</span> {dateString}
-              </div>
-              <div>
-                <span className="font-bold">Fulfilled:</span>{" "}
-                {need.fulfillment ? "Yes" : "No"}
-              </div>
-              {/* <div>
-                <span className="font-bold">Fulfilled By:</span>{" "}
-                {need.fulfillment}
-              </div>
-              <div>
-                <span className="font-bold">Fulfilled Date:</span>{" "}
-                {need.fulfillmentDate}
-              </div> */}
-              <div>
-                <span className="font-bold">Location:</span> {need.lat},{" "}
-                {need.lng}
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     );
   };

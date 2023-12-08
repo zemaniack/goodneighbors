@@ -23,6 +23,7 @@ import getUserInfo from "../../hooks/getUserInfo";
 import fetchNeeds from "@/hooks/fetchNeeds";
 import { MdModeEdit } from "react-icons/md";
 import getCoordinates from "../../hooks/coordinatesFetcher";
+import { addDataToExcel } from "@/hooks/excelShenanigans";
 
 const ProfileScreen = () => {
   const router = useRouter();
@@ -225,17 +226,38 @@ const ProfileScreen = () => {
     const needRef = collection(db, "needs");
     const newNeed = await addDoc(needRef, {
       uid: auth.currentUser.uid,
-      name: needName,
+      needName: needName,
       description: needDescription,
       urgency: urgency,
       dateRequested: new Date(),
-      fulfillment: false,
+      fulfilled: false,
       lat: coords.lat,
       lng: coords.lng,
       category: needType,
+      phoneNumber: phoneNumber,
+      name: firstName + " " + lastName,
+      dob: dob,
+      volunteer: "",
+      address: address,
     })
       .then((docRef) => {
         console.log("Document successfully written!");
+        // addDataToExcel({
+        //   address: address,
+        //   category: needType,
+        //   dateRequested: new Date(),
+        //   description: needDescription,
+        //   dob: dob,
+        //   fulfilled: false,
+        //   lat: coords.lat,
+        //   lng: coords.lng,
+        //   name: firstName + " " + lastName,
+        //   needName: needName,
+        //   phoneNumber: phoneNumber,
+        //   uid: auth.currentUser.uid,
+        //   urgency: urgency,
+        //   volunteer: "",
+        // });
         setNeedName("");
         setNeedDescription("");
         setUrgency("");
@@ -244,16 +266,20 @@ const ProfileScreen = () => {
         setNeeds((prevNeeds) => [
           ...prevNeeds,
           {
-            id: docRef.id,
             uid: auth.currentUser.uid,
-            name: needName,
+            needName: needName,
             description: needDescription,
             urgency: urgency,
             dateRequested: new Date(),
-            fulfillment: false,
+            fulfilled: false,
             lat: coords.lat,
             lng: coords.lng,
             category: needType,
+            phoneNumber: phoneNumber,
+            name: firstName + " " + lastName,
+            dob: dob,
+            volunteer: "",
+            address: address,
           },
         ]);
       })
@@ -338,7 +364,7 @@ const ProfileScreen = () => {
             onMouseEnter={(e) => (e.target.style.background = "#4096ff")}
             onMouseLeave={(e) => (e.target.style.background = "#1677FF")}
           >
-            Edit account information
+            Edit Account Information
           </div>
           <br />
         </div>
@@ -377,7 +403,7 @@ const ProfileScreen = () => {
           onMouseEnter={(e) => (e.target.style.background = "#4096ff")}
           onMouseLeave={(e) => (e.target.style.background = "#1677FF")}
         >
-          Go to settings
+          Go to Settings
         </div>
         <br />
       </div>
@@ -395,13 +421,13 @@ const ProfileScreen = () => {
         </h1>
         <br />
         <div
-          className="rounded-lg shadow-lg overflow-hidden p-5 w-full"
+          className="rounded-lg shadow-lg p-5 w-full overflow-y-auto h-[70vh]"
           style={{
             backgroundColor: "rgba(255, 255, 255, 0.1)",
-            height: "80%",
           }}
         >
-          <div className="flex flex-wrap justify-around overflow-auto">
+          {/* <div className="overflow-auto h-full"> */}
+          <div className="flex flex-wrap justify-around">
             {needs.map((need) => {
               let date;
               if (need.dateRequested instanceof Date) {
@@ -422,7 +448,7 @@ const ProfileScreen = () => {
                   }}
                 >
                   <h2 className="text-xl font-bold border-b-2 border-white flex flex-row justify-between">
-                    {need.name}
+                    {need.needName}
                     <MdModeEdit />
                   </h2>
                   <div>
@@ -444,6 +470,7 @@ const ProfileScreen = () => {
               );
             })}
           </div>
+          {/* </div> */}
         </div>
         <br />
         <div

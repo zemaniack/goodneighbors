@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { app, db } from "../../../firebaseConfig";
 import { getAuth } from "firebase/auth";
 import Link from "next/link";
+import { exportFirestoreDataToExcel } from "@/hooks/excelShenanigans";
 
 const SettingsScreen = () => {
   const auth = getAuth(app);
@@ -58,6 +59,12 @@ const SettingsScreen = () => {
           }}
         >
           Delete Account
+        </div>
+        <div
+          className="rounded-full h-auto w-auto flex bg-teal-400 p-2 cursor-pointer items-center justify-center"
+          onClick={exportFirestoreDataToExcel}
+        >
+          Genereate Excel File of Needs
         </div>
       </div>
     </div>
