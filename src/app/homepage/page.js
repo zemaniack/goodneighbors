@@ -1,16 +1,26 @@
 "use client";
 import React from "react";
 import { getAuth } from "firebase/auth";
-import { app } from "../../../firebaseConfig";
+import { app, db } from "../../../firebaseConfig";
 import getUserInfo from "../../hooks/getUserInfo";
 import generateJwt from "../../hooks/generateToken";
 import fetchNeeds from "@/hooks/fetchNeeds";
+import { useRouter } from "next/navigation";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 
 const HomeScreen = () => {
   const [userInfo, setUserInfo] = React.useState(null);
   const [token, setToken] = React.useState(null);
-  const [mainContent, setMainContent] = React.useState("dashboard");
+  const [mainContent, setMainContent] = React.useState("needs");
   const [needs, setNeeds] = React.useState(null);
+  const router = useRouter();
 
   React.useEffect(() => {
     // loads the Tableau Embedding API for embedding the dashboard.
@@ -27,7 +37,6 @@ const HomeScreen = () => {
       };
     }
     loadTableauLibrary();
-    console.log("Tableau Embedding Library loaded.");
   }, []);
 
   React.useEffect(() => {
@@ -42,14 +51,21 @@ const HomeScreen = () => {
       }
     }
     loadUserInfo();
-    console.log(userInfo);
   }, []);
+
+  React.useEffect(() => {
+    // Redirect basic users to the profile page
+    console.log(userInfo);
+
+    if (userInfo && userInfo.accountType === "Basic User") {
+      router.push("/profile");
+    }
+  }, [userInfo]);
 
   React.useEffect(() => {
     async function getToken() {
       try {
         const token = await generateJwt(); // generate and set token for Tableau access
-        console.log("Generated token: ", token);
         setToken(token);
       } catch (error) {
         console.error("Error generating token.", error);
@@ -57,11 +73,26 @@ const HomeScreen = () => {
     }
     if (token === null) {
       getToken();
-      console.log("Generated token: ", token);
     }
     // setToken(`eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjEyZWRmODE3LTk2ZGItNDc1Zi1hNzNhLThjNTMyZWZkYjkzMCIsImlzcyI6ImQ2OTUyYjNiLTVjNGQtNGZlNC1hM2U1LTBiNzA2ZGFjYTE1MCJ9.eyJqdGkiOiI1MDVjMzc1MS1iMWJkLTQ1Y2QtOTE3NC00YWYzNTIxZDcxOGYiLCJhdWQiOiJ0YWJsZWF1Iiwic3ViIjoidGFibGVhOTU1NUBnbWFpbC5jb20iLCJzY3AiOlsidGFibGVhdTp2aWV3czplbWJlZCIsInRhYmxlYXU6dmlld3M6ZW1iZWRfYXV0aG9yaW5nIiwidGFibGVhdTphc2tfZGF0YTplbWJlZCJdLCJraWQiOiIxMmVkZjgxNy05NmRiLTQ3NWYtYTczYS04YzUzMmVmZGI5MzAiLCJpc3MiOiJkNjk1MmIzYi01YzRkLTRmZTQtYTNlNS0wYjcwNmRhY2ExNTAiLCJpYXQiOjE3MDIwMDk5MDcsImV4cCI6MTcwMjAxMDUwN30.HmuNUdV2eqGCls0kXs_2moyKE_tNTe2ou5tZ3hcqBwY
     // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjEyZWRmODE3LTk2ZGItNDc1Zi1hNzNhLThjNTMyZWZkYjkzMCIsImlzcyI6ImQ2OTUyYjNiLTVjNGQtNGZlNC1hM2U1LTBiNzA2ZGFjYTE1MCJ9.eyJqdGkiOiI1MDVjMzc1MS1iMWJkLTQ1Y2QtOTE3NC00YWYzNTIxZDcxOGYiLCJhdWQiOiJ0YWJsZWF1Iiwic3ViIjoidGFibGVhOTU1NUBnbWFpbC5jb20iLCJzY3AiOlsidGFibGVhdTp2aWV3czplbWJlZCIsInRhYmxlYXU6dmlld3M6ZW1iZWRfYXV0aG9yaW5nIiwidGFibGVhdTphc2tfZGF0YTplbWJlZCJdLCJraWQiOiIxMmVkZjgxNy05NmRiLTQ3NWYtYTczYS04YzUzMmVmZGI5MzAiLCJpc3MiOiJkNjk1MmIzYi01YzRkLTRmZTQtYTNlNS0wYjcwNmRhY2ExNTAiLCJpYXQiOjE3MDIwMDk5MDcsImV4cCI6MTcwMjAxMDUwN30.HmuNUdV2eqGCls0kXs_2moyKE_tNTe2ou5tZ3hcqBwY`);
   }, []);
+
+  const attendNeed = async (needId) => {
+    let volunteerName = userInfo.firstName + " " + userInfo.lastName;
+    console.log(volunteerName);
+    try {
+      const needsRef = doc(db, "needs", needId);
+      await updateDoc(needsRef, {
+        volunteer: volunteerName,
+        fulfilled: true,
+      });
+      const needs = await fetchNeeds();
+      setNeeds(needs);
+    } catch (error) {
+      console.error("Error attending to need: ", error);
+    }
+  };
 
   const pageContent = () => {
     return (
@@ -73,54 +104,60 @@ const HomeScreen = () => {
             backgroundColor: "rgba(255, 255, 255, 0.1)",
           }}
         >
-          <div
-            className="w-full flex flex-row justify-around"
-            style={{ height: "7%" }}
-          >
+          {userInfo && (
             <div
-              className={
-                "rounded-lg shadow-lg overflow-hidden p-2 text-xl font-bold cursor-pointer h-min"
-              }
-              style={{
-                backgroundColor:
-                  mainContent === "dashboard"
-                    ? "rgba(255, 255, 255, 0.25)"
-                    : "rgba(255, 255, 255, 0.1)",
-              }}
-              onClick={() => setMainContent("dashboard")}
+              className="w-full flex flex-row justify-around"
+              style={{ height: "7%" }}
             >
-              View Needs Dashboard
+              {userInfo.accountType === "Authority" && (
+                <div
+                  className={
+                    "rounded-lg shadow-lg overflow-hidden p-2 text-xl font-bold cursor-pointer h-min"
+                  }
+                  style={{
+                    backgroundColor:
+                      mainContent === "dashboard"
+                        ? "rgba(255, 255, 255, 0.25)"
+                        : "rgba(255, 255, 255, 0.1)",
+                  }}
+                  onClick={() => setMainContent("dashboard")}
+                >
+                  View Needs Dashboard
+                </div>
+              )}
+              {userInfo.accountType === "Authority" && (
+                <div
+                  className={
+                    "rounded-lg shadow-lg overflow-hidden p-2 text-xl font-bold cursor-pointer h-min"
+                  }
+                  style={{
+                    backgroundColor:
+                      mainContent === "alerts"
+                        ? "rgba(255, 255, 255, 0.25)"
+                        : "rgba(255, 255, 255, 0.1)",
+                  }}
+                  onClick={() => setMainContent("alerts")}
+                >
+                  Send Alerts
+                </div>
+              )}
+              <div
+                v
+                className={
+                  "rounded-lg shadow-lg overflow-hidden p-2 text-xl font-bold cursor-pointer h-min"
+                }
+                style={{
+                  backgroundColor:
+                    mainContent === "needs"
+                      ? "rgba(255, 255, 255, 0.25)"
+                      : "rgba(255, 255, 255, 0.1)",
+                }}
+                onClick={() => setMainContent("needs")}
+              >
+                View User Needs
+              </div>
             </div>
-            <div
-              className={
-                "rounded-lg shadow-lg overflow-hidden p-2 text-xl font-bold cursor-pointer h-min"
-              }
-              style={{
-                backgroundColor:
-                  mainContent === "alerts"
-                    ? "rgba(255, 255, 255, 0.25)"
-                    : "rgba(255, 255, 255, 0.1)",
-              }}
-              onClick={() => setMainContent("alerts")}
-            >
-              Send Alerts
-            </div>
-            <div
-              v
-              className={
-                "rounded-lg shadow-lg overflow-hidden p-2 text-xl font-bold cursor-pointer h-min"
-              }
-              style={{
-                backgroundColor:
-                  mainContent === "needs"
-                    ? "rgba(255, 255, 255, 0.25)"
-                    : "rgba(255, 255, 255, 0.1)",
-              }}
-              onClick={() => setMainContent("needs")}
-            >
-              View User Needs
-            </div>
-          </div>
+          )}
           <div
             className="rounded-lg shadow-lg overflow-hidden p-2 w-full h-full"
             style={{
@@ -143,51 +180,99 @@ const HomeScreen = () => {
     return (
       <div className="overflow-hidden p-5 w-full overflow-y-auto h-[70vh]">
         <div className="flex flex-wrap justify-around">
-          {needs.map((need) => {
-            let date;
-            if (need.dateRequested instanceof Date) {
-              date = need.dateRequested;
-            } else if (need.dateRequested?.toDate) {
-              date = need.dateRequested.toDate();
-            } else if (
-              need.dateRequested &&
-              !isNaN(Date.parse(need.dateRequested))
-            ) {
-              date = new Date(need.dateRequested);
-            } else {
-              console.error(`Invalid date: ${need.dateRequested}`);
-              return null; // Skip this item if the date is invalid
-            }
-            const dateString = date.toISOString().split("T")[0];
-            return (
-              <div
-                className="flex flex-col flex-grow h-full justify-around rounded-lg shadow-lg p-2 m-2 h-min"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
-                  maxWidth: "300px",
-                }}
-              >
-                <h2 className="text-xl font-bold border-b-2 border-white flex flex-row justify-between">
-                  {need.needName}
-                </h2>
-                <div>
-                  <span className="font-bold">Description:</span>{" "}
-                  {need.description}
+          {needs &&
+            needs.map((need) => {
+              let date;
+              if (need.dateRequested instanceof Date) {
+                date = need.dateRequested;
+              } else if (need.dateRequested?.toDate) {
+                date = need.dateRequested.toDate();
+              } else if (
+                need.dateRequested &&
+                !isNaN(Date.parse(need.dateRequested))
+              ) {
+                date = new Date(need.dateRequested);
+              } else {
+                console.error(`Invalid date: ${need.dateRequested}`);
+                return null; // Skip this item if the date is invalid
+              }
+              const dateString = date.toISOString().split("T")[0];
+              return (
+                <div
+                  className="flex flex-col flex-grow h-full justify-around rounded-lg shadow-lg p-2 m-2 h-min"
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    maxWidth: "300px",
+                  }}
+                >
+                  <h2 className="text-xl font-bold border-b-2 border-white flex flex-row justify-between">
+                    {need.needName}
+                  </h2>
+                  <div>
+                    <span className="font-bold">Description:</span>{" "}
+                    {need.description}
+                  </div>
+                  <div>
+                    <span className="font-bold">Name:</span>{" "}
+                    {need.name ? need.name : "Anonymous"}
+                  </div>
+                  <div>
+                    <span className="font-bold">Phone Number:</span>{" "}
+                    {need.phoneNumber}
+                  </div>
+                  <div>
+                    <span className="font-bold">Urgency:</span> {need.urgency}
+                  </div>
+                  <div>
+                    <span className="font-bold">Date Requested:</span>{" "}
+                    {dateString}
+                  </div>
+                  <div className="flex flex-row justify-between">
+                    <div>
+                      <span className="font-bold">Fulfilled:</span>{" "}
+                      {need.fulfilled ? "Yes" : "No"}
+                    </div>
+                    {userInfo.accountType === "Volunteer" &&
+                      !need.fulfilled && (
+                        <div
+                          className="rounded-full shadow-lg h-auto w-auto flex pl-2 pr-2 cursor-pointer items-center justify-center"
+                          onClick={() => attendNeed(need.id)}
+                          style={{
+                            background: "#1677FF",
+                          }}
+                          onMouseEnter={(e) =>
+                            (e.target.style.background = "#4096ff")
+                          }
+                          onMouseLeave={(e) =>
+                            (e.target.style.background = "#1677FF")
+                          }
+                        >
+                          {" "}
+                          Attend Need{" "}
+                        </div>
+                      )}
+                    {userInfo.accountType === "Volunteer" && need.fulfilled && (
+                      <div
+                        className="rounded-full shadow-lg h-auto w-auto flex pl-2 pr-2 items-center justify-center"
+                        style={{
+                          background: "grey",
+                        }}
+                      >
+                        {" "}
+                        Attended{" "}
+                      </div>
+                    )}
+                  </div>
+                  {userInfo.accountType === "Authority" &&
+                    need.fulfilled === true && (
+                      <div>
+                        <span className="font-bold">Fulfilled By:</span>{" "}
+                        {need.volunteer}
+                      </div>
+                    )}
                 </div>
-                <div>
-                  <span className="font-bold">Urgency:</span> {need.urgency}
-                </div>
-                <div>
-                  <span className="font-bold">Date Requested:</span>{" "}
-                  {dateString}
-                </div>
-                <div>
-                  <span className="font-bold">Fulfilled:</span>{" "}
-                  {need.fulfillment ? "Yes" : "No"}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
         </div>
       </div>
     );

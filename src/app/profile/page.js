@@ -14,6 +14,7 @@ import {
   updateDoc,
   onSnapshot,
   addDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import ProfileCard from "../../components/profileCard";
@@ -69,10 +70,6 @@ const ProfileScreen = () => {
     {
       key: "3",
       label: "Authority",
-    },
-    {
-      key: "4",
-      label: "Authority Coordinator",
     },
   ];
 
@@ -174,6 +171,12 @@ const ProfileScreen = () => {
     setNeedType(needTypeItems[key - 1].label);
   };
 
+  const closeNeed = async (id) => {
+    const needRef = doc(db, "needs", id);
+    await deleteDoc(needRef);
+    setNeeds(needs.filter((need) => need.id !== id));
+  };
+
   const handleSave = async () => {
     const docSnap = await getSnapshot();
 
@@ -222,7 +225,6 @@ const ProfileScreen = () => {
   const handleNewNeed = async () => {
     // categories: ["food", "water", "shelter", "medical", "other"]
     let coords = await getCoordinates(address);
-    console.log(coords);
     const needRef = collection(db, "needs");
     const newNeed = await addDoc(needRef, {
       uid: auth.currentUser.uid,
@@ -242,22 +244,6 @@ const ProfileScreen = () => {
     })
       .then((docRef) => {
         console.log("Document successfully written!");
-        // addDataToExcel({
-        //   address: address,
-        //   category: needType,
-        //   dateRequested: new Date(),
-        //   description: needDescription,
-        //   dob: dob,
-        //   fulfilled: false,
-        //   lat: coords.lat,
-        //   lng: coords.lng,
-        //   name: firstName + " " + lastName,
-        //   needName: needName,
-        //   phoneNumber: phoneNumber,
-        //   uid: auth.currentUser.uid,
-        //   urgency: urgency,
-        //   volunteer: "",
-        // });
         setNeedName("");
         setNeedDescription("");
         setUrgency("");
@@ -266,6 +252,7 @@ const ProfileScreen = () => {
         setNeeds((prevNeeds) => [
           ...prevNeeds,
           {
+            id: docRef.id,
             uid: auth.currentUser.uid,
             needName: needName,
             description: needDescription,
@@ -449,7 +436,7 @@ const ProfileScreen = () => {
                 >
                   <h2 className="text-xl font-bold border-b-2 border-white flex flex-row justify-between">
                     {need.needName}
-                    <MdModeEdit />
+                    {/* <MdModeEdit /> */}
                   </h2>
                   <div>
                     <span className="font-bold">Description:</span>{" "}
@@ -462,9 +449,27 @@ const ProfileScreen = () => {
                     <span className="font-bold">Date Requested:</span>{" "}
                     {dateString}
                   </div>
-                  <div>
-                    <span className="font-bold">Fulfilled:</span>{" "}
-                    {need.fulfillment ? "Yes" : "No"}
+                  <div className="flex flex-row justify-between">
+                    <div>
+                      <span className="font-bold">Fulfilled:</span>{" "}
+                      {need.fulfillment ? "Yes" : "No"}
+                    </div>
+                    <div
+                      className="rounded-full shadow-lg h-auto w-auto flex pl-2 pr-2 cursor-pointer items-center justify-center"
+                      onClick={() => closeNeed(need.id)}
+                      style={{
+                        background: "#1677FF",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.target.style.background = "#4096ff")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.target.style.background = "#1677FF")
+                      }
+                    >
+                      {" "}
+                      Close Need{" "}
+                    </div>
                   </div>
                 </div>
               );
