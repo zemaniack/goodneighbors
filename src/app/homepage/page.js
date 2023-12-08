@@ -35,6 +35,8 @@ const HomeScreen = () => {
       try {
         const userInformation = await getUserInfo();
         setUserInfo(userInformation);
+        const needs = await fetchNeeds();
+        setNeeds(needs);
       } catch {
         console.log("Failed to get user info.");
       }
@@ -53,6 +55,7 @@ const HomeScreen = () => {
     async function getToken() {
       try {
         const token = await generateJwt(); // generate and set token for Tableau access
+        console.log("Generated token: ", token);
         setToken(token);
       } catch (error) {
         console.error("Error generating token.", error);
@@ -64,7 +67,7 @@ const HomeScreen = () => {
     }
   }, []);
 
-  const pageContent_with_auth = () => {
+  const pageContent = () => {
     //user
     return (
       <div className="flex flex-row justify-around center-items w-full h-full">
@@ -198,62 +201,27 @@ const HomeScreen = () => {
   const tableauContent = () => {
     if (userInfo === null) {
       return (
-        <div>
+        <div className="w-full h-full align-center">
           <p>Loading...</p>
         </div>
       );
     } else {
-      if (!userInfo.accountSetup) {
-        return (
-          <div>
-            <p>Looks like you haven't set up your account yet!</p>
-          </div>
-        );
-      } else {
-        return (
-          <div>
-            <p>Good job creating your account!</p>
-            <tableau-viz
-              id="tableauViz"
-              width="1000"
-              height="1000"
-              hide-tabs="false"
-              src={tableauUrl}
-              device="Desktop"
-              toolbar="bottom"
-              token={token}
-            ></tableau-viz>
-          </div>
-        );
-      }
+      return (
+        <div className="w-full h-full">
+          <tableau-viz
+            id="tableauViz"
+            width="100%"
+            height="100%"
+            hide-tabs="false"
+            src={tableauUrl}
+            device="Desktop"
+            toolbar="bottom"
+            token={token}
+          ></tableau-viz>
+        </div>
+      );
     }
   };
-
-  // Loads the actual tableau dashboard. No user authorization.
-  const pageContent = () => {
-    console.log("loading page content with token: ", token);
-    return (
-      <div>
-        <p>Good job creating your account!</p>
-
-        <tableau-viz
-          id="tableauViz"
-          width="1000"
-          height="1000"
-          hide-tabs="false"
-          src={tableauUrl}
-          device="Desktop"
-          toolbar="bottom"
-          token={token}
-        ></tableau-viz>
-      </div>
-    );
-  };
-
-  // old url
-  //const tableauUrl =
-  //"https://prod-useast-b.online.tableau.com/t/communitydashboard/views/disabilities_communities/Dashboard2/b347fd8f-9ae1-4fc9-8c1a-867b5bdd6120/8c879fdb-6fd7-46a4-bb88-a01be172d755?:embed=yes";
-
   const tableauUrl =
     "https://prod-useast-b.online.tableau.com/t/communityserver95/views/map/Dashboard1"; // new url
 
