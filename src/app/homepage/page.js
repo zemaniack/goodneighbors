@@ -1,43 +1,27 @@
 "use client";
 import React from "react";
-// import { StyleSheet, Text, View, Button, SafeAreaView } from "react-native";
-// import { LinearGradient } from "expo-linear-gradient";
 import { getAuth } from "firebase/auth";
 import { app } from "../../../firebaseConfig";
-// import Navbar from "../../components/navbar";
 import getUserInfo from "../../hooks/getUserInfo";
-// import { WebView } from "react-native-webview";
 import generateJwt from "../../hooks/generateToken";
 
 const HomeScreen = () => {
   const [userInfo, setUserInfo] = React.useState(null);
   const [token, setToken] = React.useState(null);
 
-  React.useEffect(() => { // loads the Tableau Embedding API for embedding the dashboard.
+  React.useEffect(() => {
+    // loads the Tableau Embedding API for embedding the dashboard.
     async function loadTableauLibrary() {
-      
-      const script = document.createElement('script'); // create a script element for the tableau
+      const script = document.createElement("script"); // create a script element for the tableau
       script.type = "module";
-      script.src = "https://embedding.tableauusercontent.com/tableau.embedding.3.1.0.min.js";
-      //script.async = true;
+      script.src =
+        "https://embedding.tableauusercontent.com/tableau.embedding.3.1.0.min.js";
 
-      /*
-      script.onload = () => {
-        // Once the Tableau script has loaded, you can use the tableau API here
-        const options = {
-          hideTabs: true,
-          //toolbarPosition: tableau.ToolbarPosition.Bottom,
-        };
+      document.head.appendChild(script);
+
+      return () => {
+        document.head.removeChild(script);
       };
-      */
-
-    document.head.appendChild(script);
-
-    return () => {
-      // Cleanup if needed
-      document.head.removeChild(script);
-    };
-
     }
     loadTableauLibrary();
     console.log("Tableau Embedding Library loaded.");
@@ -48,12 +32,9 @@ const HomeScreen = () => {
       try {
         const userInformation = await getUserInfo();
         setUserInfo(userInformation);
-        
-        //console.log(userInfo);
       } catch {
         console.log("Failed to get user info.");
       }
-      
     }
     loadUserInfo();
     console.log(userInfo);
@@ -64,19 +45,16 @@ const HomeScreen = () => {
       try {
         const token = await generateJwt(); // generate and set token for Tableau access
         setToken(token);
-        //pageContent();
-
       } catch (error) {
         console.error("Error generating token.", error);
       }
     }
-    if(token === null) {
+    if (token === null) {
       getToken();
       console.log("Generated token: ", token);
     }
   }, []);
 
-  
   const pageContent_with_auth = () => {
     //user
     if (userInfo === null) {
@@ -97,16 +75,15 @@ const HomeScreen = () => {
           <div>
             <p>Good job creating your account!</p>
             <tableau-viz
-            id="tableauViz"
-            width="1000"
-            height="1000"
-            hide-tabs="false"
-            src={tableauUrl}
-            device="Desktop"
-            toolbar="bottom"
-            token= {token}
-            >   
-          </tableau-viz>
+              id="tableauViz"
+              width="1000"
+              height="1000"
+              hide-tabs="false"
+              src={tableauUrl}
+              device="Desktop"
+              toolbar="bottom"
+              token={token}
+            ></tableau-viz>
           </div>
         );
       }
@@ -121,27 +98,25 @@ const HomeScreen = () => {
         <p>Good job creating your account!</p>
 
         <tableau-viz
-            id="tableauViz"
-            width="1000"
-            height="1000"
-            hide-tabs="false"
-            src={tableauUrl}
-            device="Desktop"
-            toolbar="bottom"
-            token= {token}
-            >   
-          </tableau-viz>
-
+          id="tableauViz"
+          width="1000"
+          height="1000"
+          hide-tabs="false"
+          src={tableauUrl}
+          device="Desktop"
+          toolbar="bottom"
+          token={token}
+        ></tableau-viz>
       </div>
     );
   };
 
   // old url
   //const tableauUrl =
-    //"https://prod-useast-b.online.tableau.com/t/communitydashboard/views/disabilities_communities/Dashboard2/b347fd8f-9ae1-4fc9-8c1a-867b5bdd6120/8c879fdb-6fd7-46a4-bb88-a01be172d755?:embed=yes";
+  //"https://prod-useast-b.online.tableau.com/t/communitydashboard/views/disabilities_communities/Dashboard2/b347fd8f-9ae1-4fc9-8c1a-867b5bdd6120/8c879fdb-6fd7-46a4-bb88-a01be172d755?:embed=yes";
 
-  const tableauUrl = "https://prod-useast-b.online.tableau.com/t/communityserver95/views/map/Dashboard1" // new url
-  
+  const tableauUrl =
+    "https://prod-useast-b.online.tableau.com/t/communityserver95/views/map/Dashboard1"; // new url
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen w-screen bg-gradient-to-r from-blue-400 via-blue-500 to-blue-700">
