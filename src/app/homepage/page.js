@@ -64,25 +64,8 @@ const HomeScreen = () => {
   }, []);
 
   const pageContent = () => {
-    //user
     return (
       <div className="flex flex-row justify-around center-items w-full h-full">
-        <div
-          className="rounded-lg shadow-lg overflow-hidden p-5 m-5"
-          style={{
-            backgroundColor: "rgba(255, 255, 255, 0.1)",
-            width: "25%",
-            // borderRadius: "5px",
-          }}
-        >
-          <div className="flex flex-col items-center justify-center">
-            <h1 className="text-xl font-bold border-b border-white">
-              Send an Alert
-            </h1>
-            <br />
-            <div className=""></div>
-          </div>
-        </div>
         <div
           className="rounded-lg shadow-lg overflow-hidden p-3 m-5 flex flex-col justify-around"
           style={{
@@ -106,7 +89,21 @@ const HomeScreen = () => {
               }}
               onClick={() => setMainContent("dashboard")}
             >
-              View Dashboard
+              View Needs Dashboard
+            </div>
+            <div
+              className={
+                "rounded-lg shadow-lg overflow-hidden p-2 text-xl font-bold cursor-pointer h-min"
+              }
+              style={{
+                backgroundColor:
+                  mainContent === "alerts"
+                    ? "rgba(255, 255, 255, 0.25)"
+                    : "rgba(255, 255, 255, 0.1)",
+              }}
+              onClick={() => setMainContent("alerts")}
+            >
+              Send Alerts
             </div>
             <div
               v
@@ -132,7 +129,9 @@ const HomeScreen = () => {
             }}
           >
             {mainContent === "dashboard"
-              ? tableauContent()
+              ? tableauContent1()
+              : mainContent === "alerts"
+              ? tableauContent2()
               : userNeedsContent()}
           </div>
         </div>
@@ -194,7 +193,9 @@ const HomeScreen = () => {
     );
   };
 
-  const tableauContent = () => {
+  const tableauContent1 = () => {
+    const tableauUrl =
+      "https://prod-useast-b.online.tableau.com/t/communityserver95/views/map/Dashboard1";
     if (userInfo === null) {
       return (
         <div className="w-full h-full align-center">
@@ -218,11 +219,37 @@ const HomeScreen = () => {
       );
     }
   };
-  const tableauUrl =
-    "https://prod-useast-b.online.tableau.com/t/communityserver95/views/map/Dashboard1"; // new url
+
+  const tableauContent2 = () => {
+    const tableauUrl =
+      "https://prod-useast-b.online.tableau.com/#/site/communityserver95/views/disabilities_communities/Dashboard2/84185b2a-686a-4709-892c-d1a022f473d6/6ec1fe26-7aea-41cd-92ad-ca31a14be50a";
+    if (userInfo === null) {
+      return (
+        <div className="w-full h-full align-center">
+          <p>Loading...</p>
+        </div>
+      );
+    } else {
+      return (
+        <div className="w-full h-full">
+          <tableau-viz
+            id="tableauViz"
+            width="100%"
+            height="100%"
+            hide-tabs="false"
+            src={tableauUrl}
+            device="Desktop"
+            toolbar="bottom"
+            token={token}
+          ></tableau-viz>
+        </div>
+      );
+    }
+  };
+  // new url
 
   return (
-    <div className="flex flex-col items-center justify-center h-full w-screen bg-gradient-to-r from-blue-400 via-blue-500 to-blue-700">
+    <div className="flex flex-col items-center justify-center h-full w-full bg-gradient-to-r from-blue-400 via-blue-500 to-blue-700">
       {pageContent()}
       {/*<iframe src={tableauUrl} height="90%" width="90%" />*/}
     </div>
