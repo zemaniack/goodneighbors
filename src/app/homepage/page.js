@@ -45,12 +45,6 @@ const HomeScreen = () => {
     console.log(userInfo);
   }, []);
 
-  // Rerender when userInfo or needs change
-  React.useEffect(() => {
-    console.log(userInfo);
-    console.log(needs);
-  }, [userInfo, needs]);
-
   React.useEffect(() => {
     async function getToken() {
       try {
@@ -65,6 +59,8 @@ const HomeScreen = () => {
       getToken();
       console.log("Generated token: ", token);
     }
+    // setToken(`eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjEyZWRmODE3LTk2ZGItNDc1Zi1hNzNhLThjNTMyZWZkYjkzMCIsImlzcyI6ImQ2OTUyYjNiLTVjNGQtNGZlNC1hM2U1LTBiNzA2ZGFjYTE1MCJ9.eyJqdGkiOiI1MDVjMzc1MS1iMWJkLTQ1Y2QtOTE3NC00YWYzNTIxZDcxOGYiLCJhdWQiOiJ0YWJsZWF1Iiwic3ViIjoidGFibGVhOTU1NUBnbWFpbC5jb20iLCJzY3AiOlsidGFibGVhdTp2aWV3czplbWJlZCIsInRhYmxlYXU6dmlld3M6ZW1iZWRfYXV0aG9yaW5nIiwidGFibGVhdTphc2tfZGF0YTplbWJlZCJdLCJraWQiOiIxMmVkZjgxNy05NmRiLTQ3NWYtYTczYS04YzUzMmVmZGI5MzAiLCJpc3MiOiJkNjk1MmIzYi01YzRkLTRmZTQtYTNlNS0wYjcwNmRhY2ExNTAiLCJpYXQiOjE3MDIwMDk5MDcsImV4cCI6MTcwMjAxMDUwN30.HmuNUdV2eqGCls0kXs_2moyKE_tNTe2ou5tZ3hcqBwY
+    // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjEyZWRmODE3LTk2ZGItNDc1Zi1hNzNhLThjNTMyZWZkYjkzMCIsImlzcyI6ImQ2OTUyYjNiLTVjNGQtNGZlNC1hM2U1LTBiNzA2ZGFjYTE1MCJ9.eyJqdGkiOiI1MDVjMzc1MS1iMWJkLTQ1Y2QtOTE3NC00YWYzNTIxZDcxOGYiLCJhdWQiOiJ0YWJsZWF1Iiwic3ViIjoidGFibGVhOTU1NUBnbWFpbC5jb20iLCJzY3AiOlsidGFibGVhdTp2aWV3czplbWJlZCIsInRhYmxlYXU6dmlld3M6ZW1iZWRfYXV0aG9yaW5nIiwidGFibGVhdTphc2tfZGF0YTplbWJlZCJdLCJraWQiOiIxMmVkZjgxNy05NmRiLTQ3NWYtYTczYS04YzUzMmVmZGI5MzAiLCJpc3MiOiJkNjk1MmIzYi01YzRkLTRmZTQtYTNlNS0wYjcwNmRhY2ExNTAiLCJpYXQiOjE3MDIwMDk5MDcsImV4cCI6MTcwMjAxMDUwN30.HmuNUdV2eqGCls0kXs_2moyKE_tNTe2ou5tZ3hcqBwY`);
   }, []);
 
   const pageContent = () => {
@@ -166,7 +162,7 @@ const HomeScreen = () => {
             const dateString = date.toISOString().split("T")[0];
             return (
               <div
-                className="flex flex-col flex-grow justify-around rounded-lg shadow-lg p-2 m-2 h-min"
+                className="flex flex-col flex-grow h-full justify-around rounded-lg shadow-lg p-2 m-2 h-min"
                 style={{
                   backgroundColor: "rgba(255, 255, 255, 0.1)",
                   maxWidth: "300px",
